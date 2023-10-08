@@ -118,6 +118,7 @@ classdef Assignment2Group
         
         
             % Use Robot A to move bottle from initial pose to intermediate pose
+            finalRobot2Dest = r1.model.ikcon(finalBrickPose,PoseGuess);
 
 
 
