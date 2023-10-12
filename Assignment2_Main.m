@@ -1,6 +1,6 @@
 % Connor Keogh      13220482
 % Nicholas Mullan   11111111
-% Patrick Hore      11111111
+% Patrick Hore      13623943
 
 classdef Assignment2Group
 
@@ -45,11 +45,13 @@ classdef Assignment2Group
         
         
         function SetupEnvironment()
-        %%     
-        
-        
-        
-        
+       
+%% ENVIRONMENT SET UP
+%Setting up enviroment 
+% Define the ENVIRONMENTXYZ position.
+ENVIRONMENTXYZ = [ 0,0,0];
+% Call the PlaceObject function to place the table.
+PlaceObject('ENVIRONMENT.ply',ENVIRONMENTXYZ);
         
         
         end
