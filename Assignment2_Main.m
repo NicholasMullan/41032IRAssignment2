@@ -9,7 +9,7 @@ classdef Assignment2Group
         NumberOfObjects = 9; 
         
         % Define the height of the bar / table here for use of robot placement
-        BarTableheight = 0.5; 
+        BarTableheight = 0.9; %%(900mm) 
 
         %Work out how to set these
         InitialObjectLocationsArray =       [0,0,0];
