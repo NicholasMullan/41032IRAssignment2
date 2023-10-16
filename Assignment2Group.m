@@ -56,50 +56,41 @@ classdef Assignment2Group
         
         function SetupEnvironment()
 
+
 clf; %Clear Current Figure
 clear all; %Clear all variables from workspace
-clc %clear command window
 hold on;
 %Setting up enviroment 
-x1 = -2; % X-coordinate start
-x2 = 2; % X-coordinate end
-y1 = -2; % Y-coordinate start
-y2 = 2; % Y-coordinate end
-z1 = 0; % Z-coordinate start
-z2 = 3; % Z-coordinate end
-% Define the ENVIRONMENTXYZ position.
-ENVIROMENTBase = transl(0, 0, 0) * rpy2tr(0, 0, 0); % Sets default value
-ENVIRONMENTRad = 2;
-ENVIRONMENTHeight = 3;
-ENVIRONMENTXYZ = [ 0,0,0];
-% Call the PlaceObject function to place the table.
-PlaceObject('TESTENVIRONEMT.ply',ENVIRONMENTXYZ);
-%Loading the FLoor
-floorX = [ENVIROMENTBase(1,4)-ENVIRONMENTRad,ENVIROMENTBase(1,4)-ENVIRONMENTRad;ENVIROMENTBase(1,4)+ENVIRONMENTRad,ENVIROMENTBase(1,4)+ENVIRONMENTRad];
-floorY = [ENVIROMENTBase(2,4)-ENVIRONMENTRad,ENVIROMENTBase(2, 4)+ENVIRONMENTRad;ENVIROMENTBase(2,4)-ENVIRONMENTRad,ENVIROMENTBase(2,4)+ENVIRONMENTRad];
-floorZ = [ENVIROMENTBase(3,4),ENVIROMENTBase(3,4);ENVIROMENTBase(3,4),ENVIROMENTBase(3,4)];
+rs= 3; %Roomsize
+wh= 3; % Wall height
+wb=0; %wall base
 
 % Create a textured surface for the floor.
-surf(floorX,floorY,floorZ,'CData',imread('ConcreteFloor.jpg'),'FaceColor','texturemap');
-% Define the axis limits for the plot.
-axis([ENVIROMENTBase(1, 4) - ENVIRONMENTRad,ENVIROMENTBase(1, 4) + ENVIRONMENTRad, ENVIROMENTBase(2, 4) - ENVIRONMENTRad,ENVIROMENTBase(2, 4) + ENVIRONMENTRad, ENVIROMENTBase(3, 4),ENVIROMENTBase(3, 4) + ENVIRONMENTHeight]);
+ surf([-rs,-rs;rs,rs] ,[-rs,rs;-rs,rs] ,[0.01,0.01;0.01,0.01],'CData',imread('ConcreteFloor.jpg'),'FaceColor','texturemap')
 
+%
+% Define the axis limits for the plot.
+%axis([-rs, rs; -rs, rs; wb, wh]);
 %Setting Up Wall 1 
 % Define wallX, wallY, and wallZ arrays for the wall surface.
-wall1X = [x1, x2; x1, x2]; % Specify x1 and x2 as the X-coordinates.
-wall1Y = [-2, -2; -2, -2]; % Specify y1 and y2 as the Y-coordinates.
-wall1Z = [z1, z1; z2, z2]; % Specify z1 and z2 as the Z-coordinates.
+
 
 % Create a textured surface for the wall.
-surf(wall1X,wall1Y,wall1Z,'CData',imread('Brickwall.jpg'),'FaceColor','texturemap');
+surf([-rs, -rs; rs, rs],[-rs, -rs; -rs, -rs],[wb, wh; wb, wh],'CData',imread('Brickwall.jpg'),'FaceColor','texturemap')
 
 %Setting Up Wall 2
 % Define wallX, wallY, and wallZ arrays for the wall surface.
-wall2X = [-2, -2; -2, -2]; % Specify x1 and x2 as the X-coordinates.
-wall2Y = [y1, y2; y1, y2]; % Specify y1 and y2 as the Y-coordinates.
-wall2Z = [z1, z1; z2, z2]; % Specify z1 and z2 as the Z-coordinates.
 
-surf(wall2X,wall2Y,wall2Z,'CData',imread('Brickwall.jpg'),'FaceColor','texturemap')
+surf([-rs, -rs; -rs, -rs],[-rs, -rs; rs, rs],[wb, wh; wb, wh],'CData',imread('Brickwall.jpg'),'FaceColor','texturemap')
+
+%'table
+table1XYZ = [0,0,0];
+% Call the PlaceObject function to place the table.
+PlaceObject('tableBrown2.1x1.4x0.5m.ply',table1XYZ);
+%'table
+table2XYZ = [-1,1,0];
+% Call the PlaceObject function to place the table.
+PlaceObject('tableBrown2.1x1.4x0.5m.ply',table2XYZ);
 
 %% ENVIRONMENT SET UP
 %Setting up enviroment 
@@ -107,32 +98,31 @@ surf(wall2X,wall2Y,wall2Z,'CData',imread('Brickwall.jpg'),'FaceColor','texturema
 %ENVIRONMENTXYZ = [ 0,0,0];
 % Call the PlaceObject function to place the table.
 %PlaceObject('ENVIRONMENT.ply',ENVIRONMENTXYZ);
-clear all
-clf 
-clc
+%clear all
+%clf 
+%clc
 
 %% 
-        hold on
-        rs = 4; % RoomSize
-        surf([-rs,-rs;rs,rs] ,[-rs,rs;-rs,rs] ,[0.01,0.01;0.01,0.01] ,'CData',imread('concrete.jpg') ,'FaceColor','texturemap');
+        %hold on
+        %rs = 4; % RoomSize
+        %surf([-rs,-rs;rs,rs] ,[-rs,rs;-rs,rs] ,[0.01,0.01;0.01,0.01] ,'CData',imread('concrete.jpg') ,'FaceColor','texturemap');
 
         %put in walls
-        TopWall = PlaceObject('wall.ply',[-2,rs,1]);
-        LeftWall = PlaceObject('wall.ply',[-2,rs,1]);
-                rotate(LeftWall, [0,0,1], 90, [0,0,0]);
-        TopWall2 = PlaceObject('wall.ply',[2,rs,1]);
-        LeftWall2 = PlaceObject('wall.ply',[2,rs,1]);
-                rotate(LeftWall2, [0,0,1], 90, [0,0,0]);
+        %TopWall = PlaceObject('wall.ply',[-2,rs,1]);
+       % LeftWall = PlaceObject('wall.ply',[-2,rs,1]);
+         %       rotate(LeftWall, [0,0,1], 90, [0,0,0]);
+        %TopWall2 = PlaceObject('wall.ply',[2,rs,1]);
+        %LeftWall2 = PlaceObject('wall.ply',[2,rs,1]);
+        %        rotate(LeftWall2, [0,0,1], 90, [0,0,0]);
 
 
-        surf([-1.375,-1.375;-1.25,-1.25],[-1.25,1.25;-1.25,1.25],[0.02,0.02;0.02,0.02],'CData',imread('tape.jpg'),'FaceColor','texturemap');
-        surf([1.375,1.375;1.25,1.25],[-1.25,1.25;-1.25,1.25],[0.02,0.02;0.02,0.02],'CData',imread('tape.jpg'),'FaceColor','texturemap');
-        surf([-1.375,1.375;-1.375,1.375],[-1.375,-1.375;-1.25,-1.25],[0.02,0.02;0.02,0.02],'CData',imread('tape.jpg'),'FaceColor','texturemap');
-        surf([-1.375,1.375;-1.375,1.375],[1.375,1.375;1.25,1.25],[0.02,0.02;0.02,0.02],'CData',imread('tape.jpg'),'FaceColor','texturemap');
+        %surf([-1.375,-1.375;-1.25,-1.25],[-1.25,1.25;-1.25,1.25],[0.02,0.02;0.02,0.02],'CData',imread('tape.jpg'),'FaceColor','texturemap');
+        %surf([1.375,1.375;1.25,1.25],[-1.25,1.25;-1.25,1.25],[0.02,0.02;0.02,0.02],'CData',imread('tape.jpg'),'FaceColor','texturemap');
+        %surf([-1.375,1.375;-1.375,1.375],[-1.375,-1.375;-1.25,-1.25],[0.02,0.02;0.02,0.02],'CData',imread('tape.jpg'),'FaceColor','texturemap');
+        %surf([-1.375,1.375;-1.375,1.375],[1.375,1.375;1.25,1.25],[0.02,0.02;0.02,0.02],'CData',imread('tape.jpg'),'FaceColor','texturemap');
 
 
-        PlaceObject('tableBrown2.1x1.4x0.5m.ply',[0,0,0]);
-        PlaceObject('tableBrown2.1x1.4x0.5m.ply',[2,0,0]);
+        %PlaceObject('tableBrown2.1x1.4x0.5m.ply',[2,0,0]);
         %PlaceObject('Shelves.ply',[-0.8,0.85,0]);
         %PlaceObject('Shelves.ply',[0,0.85,0]);
         %PlaceObject('Shelves.ply',[0.8,0.85,0]);

@@ -1,0 +1,28 @@
+
+%Setting up enviroment 
+rs= 2; %Roomsize
+wh= 3; % Wall height
+wb=0; %wall base
+
+% Create a textured surface for the floor.
+ %surf([-rs,-rs;rs,rs] ,[-rs,rs;-rs,rs] ,[0.01,0.01;0.01,0.01],'CData',imread('ConcreteFloor.jpg'),'FaceColor','texturemap')
+
+%
+% Define the axis limits for the plot.
+%axis([-rs, rs; -rs, rs; wb, wh]);
+%Setting Up Wall 1 
+% Define wallX, wallY, and wallZ arrays for the wall surface.
+
+
+% Create a textured surface for the wall.
+%surf([-rs, -rs; rs, rs],[-1, -1; -1, -1],[wb, wh; wb, wh],'CData',imread('Brickwall.jpg'),'FaceColor','texturemap')
+
+%Setting Up Wall 2
+% Define wallX, wallY, and wallZ arrays for the wall surface.
+
+surf([-2, -2; -2, -2],[-rs, -rs; rs, rs],[wb, wh; wb, wh],'CData',imread('Brickwall.jpg'),'FaceColor','texturemap')
+
+%'table'
+%tableXYZ = [0,0,0];
+% Call the PlaceObject function to place the table.
+%PlaceObject('tableBrown2.1x1.4x0.5m.ply',tableXYZ);
