@@ -2,7 +2,7 @@
 % any object. 
 
 
-classdef Object < handle
+classdef IR_Object < handle
 
     properties
         
@@ -13,6 +13,7 @@ classdef Object < handle
         Name
         workspace = [-1.8 1.8 -1.8 1.8 -0.3 2];
         model
+        Type
     end
 
     methods 
@@ -21,13 +22,14 @@ classdef Object < handle
         %testing. 
         %Note the type MUST include .ply in the name
         
-        function self = Object(type, name, pose, colour)
+        function self = IR_Object(type, name, pose, colour)
         self.Name = name;
         self.BasePose = pose;
-        self.BaseOrientation = orientation;
+        %self.BaseOrientation = orientation;
+        Type = type;
 
          % Load vertices and faces from the PLY file
-        [faceData, vertexData] = plyread(type, 'tri');
+        [faceData, vertexData] = plyread(Type, 'tri');
         link1 = Link('alpha',0,'a',0,'d',0,'offset',0);
         self.model = SerialLink(link1,'name',name);
         self.model.faces = {[], faceData};
@@ -45,7 +47,7 @@ classdef Object < handle
             self.BasePose = newPose;
             
             % Load vertices and faces from the PLY file
-            [faceData, vertexData] = plyread('HalfSizedRedGreenBrick.ply', 'tri');
+            [faceData, vertexData] = plyread(Type, 'tri');
             
             % Transform vertices according to the new pose
             transformedVertices = (self.BasePose * [vertexData(:, 1:3), ones(size(vertexData, 1), 1)]')';
