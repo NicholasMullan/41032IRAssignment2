@@ -61,8 +61,8 @@ clf; %Clear Current Figure
 clear all; %Clear all variables from workspace
 hold on;
 %Setting up enviroment 
-rs= 3; %Roomsize
-wh= 3; % Wall height
+rs= 2; %Roomsize
+wh= 2; % Wall height
 wb=0; %wall base
 fh=0.01; %floor height
 % Create a textured surface for the floor.
@@ -83,32 +83,18 @@ surf([-rs, -rs; rs, rs],[-rs, -rs; -rs, -rs],[wb, wh; wb, wh],'CData',imread('Br
 
 surf([-rs, -rs; -rs, -rs],[-rs, -rs; rs, rs],[wb, wh; wb, wh],'CData',imread('Brickwall.jpg'),'FaceColor','texturemap')
 
-%'table
-table1XYZ = [0,0,fh];
-% Call the PlaceObject function to place the table.
-PlaceObject('tableBrown2.1x1.4x0.5m.ply',table1XYZ);
-%'table
-table2XYZ = [-1,1,fh];
-% Call the PlaceObject function to place the table.
-PlaceObject('tableBrown2.1x1.4x0.5m.ply',table2XYZ);
 
-% Place fence
-fence1XYZ = [0,0,fh];
-%call the Place Object function to place fence
-PlaceObject('fence.ply',fence1XYZ)
 
-% Place fence
-fence2XYZ = [-1,0,fh];
-%call the Place Object function to place fence
-PlaceObject('fence.ply',fence2XYZ)
+% Place Evironment Alterations can be made in blender
+PlaceObject('Environment.ply',[1,1,fh]);
 
-%Place Fire Extinguisher
-fireXYZ = [-2.9,2.9,fh+0.5];
-%Placing fire extingisher
-PlaceObject ('fireExtinguisherElevated.ply',fireXYZ)
+
+
 
 %Place cctv camera
-cctvXYZ =
+cctvXYZ=[-rs-0.1,-rs,wh-0.5];
+%Placing CCTV
+PlaceObject('cctv.ply',cctvXYZ)
 %% ENVIRONMENT SET UP
 %Setting up enviroment 
 % Define the ENVIRONMENTXYZ position.
