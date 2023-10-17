@@ -86,9 +86,10 @@ surf([-rs, -rs; -rs, -rs],[-rs, -rs; rs, rs],[wb, wh; wb, wh],'CData',imread('Br
 
 
 % Place Evironment Alterations can be made in blender
-PlaceObject('Environment.ply',[1,1,fh]);
+PlaceObject('Environment.ply',[-0.5,1,fh]);
 
-
+%Placing Human
+PlaceObject('personMaleOld.ply',[1,1,fh])
 
 
 %Place cctv camera
