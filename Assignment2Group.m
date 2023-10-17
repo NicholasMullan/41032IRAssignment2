@@ -9,15 +9,15 @@ classdef Assignment2Group
 
         
         % Define the height of the bar / table here for use of robot placement
-        BarTableheight = 0.5; %%(900mm) 
-        OffsetTable = 0.05;
+        BarTableheight = 0.74; %%(800mm) 
+        OffsetTable = 0.02;
 
         %Work out how to set the bottle locations in bottle setup function
         InitialObjectLocationsArray =       [0,0,0];
-        IntermediateObjectLocationsArray=   [0,0,0];
+        IntermediateObjectLocations =       [0,0,0];
         FinalObjectLocationsArray =         [0,0,0];
 
-        NumberOfBottles = 8; %how many do we want to simulate
+        NumberOfBottles = 9; %how many do we want to simulate
         %BottleArray = cell(NumberOfBottles, 1);
         BottleColours = {"Lemonade", "Coca-Cola", "Solo", "Fanta" }
 
@@ -43,7 +43,6 @@ classdef Assignment2Group
         function ClearAndClose()
             %% Reset simulation environment
             clc;
-            clf; 
             clear all; 
             hold on
             % close all; %Dont close all. Dock the figure for ease of use
@@ -55,82 +54,48 @@ classdef Assignment2Group
         
         
         function SetupEnvironment()
-
-
-clf; %Clear Current Figure
-clear all; %Clear all variables from workspace
-hold on;
-%Setting up enviroment 
-rs= 2; %Roomsize
-wh= 2; % Wall height
-wb=0; %wall base
-fh=0.01; %floor height
-% Create a textured surface for the floor.
- surf([-rs,-rs;rs,rs] ,[-rs,rs;-rs,rs] ,[fh,fh;fh,fh],'CData',imread('ConcreteFloor.jpg'),'FaceColor','texturemap')
-
-%
-% Define the axis limits for the plot.
-%axis([-rs, rs; -rs, rs; wb, wh]);
-%Setting Up Wall 1 
-% Define wallX, wallY, and wallZ arrays for the wall surface.
-
-
-% Create a textured surface for the wall.
-surf([-rs, -rs; rs, rs],[-rs, -rs; -rs, -rs],[wb, wh; wb, wh],'CData',imread('Brickwall.jpg'),'FaceColor','texturemap')
-
-%Setting Up Wall 2
-% Define wallX, wallY, and wallZ arrays for the wall surface.
-
-surf([-rs, -rs; -rs, -rs],[-rs, -rs; rs, rs],[wb, wh; wb, wh],'CData',imread('Brickwall.jpg'),'FaceColor','texturemap')
-
-
-
-% Place Evironment Alterations can be made in blender
-PlaceObject('Environment.ply',[-0.5,1,fh]);
-
-%Placing Human
-PlaceObject('personMaleOld.ply',[1,1,fh])
-
-
-%Place cctv camera
-cctvXYZ=[-rs-0.1,-rs,wh-0.5];
-%Placing CCTV
-PlaceObject('cctv.ply',cctvXYZ)
-%% ENVIRONMENT SET UP
-%Setting up enviroment 
-% Define the ENVIRONMENTXYZ position.
-%ENVIRONMENTXYZ = [ 0,0,0];
-% Call the PlaceObject function to place the table.
-%PlaceObject('ENVIRONMENT.ply',ENVIRONMENTXYZ);
-%clear all
-%clf 
-%clc
-
-%% 
-        %hold on
-        %rs = 4; % RoomSize
-        %surf([-rs,-rs;rs,rs] ,[-rs,rs;-rs,rs] ,[0.01,0.01;0.01,0.01] ,'CData',imread('concrete.jpg') ,'FaceColor','texturemap');
-
-        %put in walls
-        %TopWall = PlaceObject('wall.ply',[-2,rs,1]);
-       % LeftWall = PlaceObject('wall.ply',[-2,rs,1]);
-         %       rotate(LeftWall, [0,0,1], 90, [0,0,0]);
-        %TopWall2 = PlaceObject('wall.ply',[2,rs,1]);
-        %LeftWall2 = PlaceObject('wall.ply',[2,rs,1]);
-        %        rotate(LeftWall2, [0,0,1], 90, [0,0,0]);
-
-
-        %surf([-1.375,-1.375;-1.25,-1.25],[-1.25,1.25;-1.25,1.25],[0.02,0.02;0.02,0.02],'CData',imread('tape.jpg'),'FaceColor','texturemap');
-        %surf([1.375,1.375;1.25,1.25],[-1.25,1.25;-1.25,1.25],[0.02,0.02;0.02,0.02],'CData',imread('tape.jpg'),'FaceColor','texturemap');
-        %surf([-1.375,1.375;-1.375,1.375],[-1.375,-1.375;-1.25,-1.25],[0.02,0.02;0.02,0.02],'CData',imread('tape.jpg'),'FaceColor','texturemap');
-        %surf([-1.375,1.375;-1.375,1.375],[1.375,1.375;1.25,1.25],[0.02,0.02;0.02,0.02],'CData',imread('tape.jpg'),'FaceColor','texturemap');
-
-
-        %PlaceObject('tableBrown2.1x1.4x0.5m.ply',[2,0,0]);
-        %PlaceObject('Shelves.ply',[-0.8,0.85,0]);
-        %PlaceObject('Shelves.ply',[0,0.85,0]);
-        %PlaceObject('Shelves.ply',[0.8,0.85,0]);
-
+        %% 
+        
+        clf; %Clear Current Figure
+        clear all; %Clear all variables from workspace
+        hold on;
+        %Setting up enviroment 
+        rs= 2; %Roomsize
+        wh= 2; % Wall height
+        wb=0; %wall base
+        fh=0.01; %floor height
+        % Create a textured surface for the floor.
+         surf([-rs,-rs;rs,rs] ,[-rs,rs;-rs,rs] ,[fh,fh;fh,fh],'CData',imread('ConcreteFloor.jpg'),'FaceColor','texturemap')
+        
+        %
+        % Define the axis limits for the plot.
+        %axis([-rs, rs; -rs, rs; wb, wh]);
+        %Setting Up Wall 1 
+        % Define wallX, wallY, and wallZ arrays for the wall surface.
+        
+        
+        % Create a textured surface for the wall.
+        surf([-rs, -rs; rs, rs],[-rs, -rs; -rs, -rs],[wb, wh; wb, wh],'CData',imread('Brickwall.jpg'),'FaceColor','texturemap')
+        
+        %Setting Up Wall 2
+        % Define wallX, wallY, and wallZ arrays for the wall surface.
+        
+        surf([-rs, -rs; -rs, -rs],[-rs, -rs; rs, rs],[wb, wh; wb, wh],'CData',imread('Brickwall.jpg'),'FaceColor','texturemap')
+        
+        
+        
+        % Place Evironment Alterations can be made in blender
+        PlaceObject('Environment.ply',[-0.5,1,fh]);
+        
+        %Placing Human
+        PlaceObject('personMaleOld.ply',[1,1,fh])
+        
+        
+        %Place cctv camera
+        cctvXYZ=[-rs-0.1,-rs,wh-0.5];
+        %Placing CCTV
+        PlaceObject('cctv.ply',cctvXYZ)
+        
                 
         end
 
@@ -139,24 +104,24 @@ PlaceObject('cctv.ply',cctvXYZ)
         %Robot 1 is the UR5
         hold on
 
-        r1 = UR5();
-        r1.model.base = r1.model.base * SE3(0,0,BarTableheight + OffsetTable);
+        r1 = UR3();
+        r1.model.base = r1.model.base * SE3(-0.5,-0.3,BarTableheight + OffsetTable);
         r1.model.animate(r1.model.getpos);
 
-        gripper = Gripper();
-        gripper.gripperbase_.base = r1.model.base.T * transl(0,0.70,-0.19) * troty(pi);
-        gripper.leftFinger.base = r1.model.base.T  * (gripper.leftFinger.base.T * transl(0,0.70,-0.19)) * troty(pi);
-        gripper.rightFinger.base = r1.model.base.T * (gripper.rightFinger.base.T * transl(0,0.70,-0.19)) * troty(pi);
-        gripper.gripperbase_.animate(gripper.gripperbase_.getpos);
-        gripper.leftFinger.animate(gripper.leftFinger.getpos);
-        gripper.rightFinger.animate(gripper.rightFinger.getpos);
-
-
+        % gripper = Gripper();
+        % gripper.gripperbase_.base = r1.model.base.T * transl(0,0.70,-0.19) * troty(pi);
+        % gripper.leftFinger.base = r1.model.base.T  * (gripper.leftFinger.base.T * transl(0,0.70,-0.19)) * troty(pi);
+        % gripper.rightFinger.base = r1.model.base.T * (gripper.rightFinger.base.T * transl(0,0.70,-0.19)) * troty(pi);
+        % gripper.gripperbase_.animate(gripper.gripperbase_.getpos);
+        % gripper.leftFinger.animate(gripper.leftFinger.getpos);
+        % gripper.rightFinger.animate(gripper.rightFinger.getpos);
+        % 
+        % 
         %Robot 2 is custom robot
         hold on
-        r2 = UR3();
+        r2 = LinearLite6();
         %r2.model.base = r2.model.base * SE3(0,BarTableheight + OffsetTable,1.5);
-        r2.model.base = r2.model.base *  SE3(1,0,BarTableheight + OffsetTable);
+        r2.model.base = r2.model.base *  SE3(-1.15,BarTableheight + OffsetTable,0);
 
         r2.model.animate(r2.model.getpos);
 
@@ -166,24 +131,24 @@ PlaceObject('cctv.ply',cctvXYZ)
         function SetArrayValues()         
             %% Set up bottle initial locations
             % note no orientation considering bottle is mirrored about Z-axis.             
-            BarTableheight = 0.48;
-            
+            TallBarTable = 0.95;
+
             InitialObjectLocationsArray = [
                 %Location XYZ   
-                0.8,    0.45,    BarTableheight;           %Object 1
-                1,      0.45,   BarTableheight;          %Object 2
-                1.2,    0.45,   BarTableheight;          %Object 3
-                1.4,    0.45,    BarTableheight;          %Object 4
-                0.8,    -0.45,   BarTableheight;         %Object 5
-                1,      -0.45,   BarTableheight;         %Object 6
-                1.2,    -0.45,    BarTableheight;          %Object 7
-                1.4,    -0.45,   BarTableheight;         %Object 8
-                1.8,    -0.45,   BarTableheight;         %Object 9
+                -1.6,    -0.4,    TallBarTable;           %Object 1
+                -1.6,    -0.2,   TallBarTable;          %Object 2
+                -1.6,    0,   TallBarTable;          %Object 3
+                -1.6,    0.2,    TallBarTable;          %Object 4
+                -1.6,    0.4,   TallBarTable;         %Object 5
+                -1.6,    0.6,   TallBarTable;         %Object 6
+                -1.6,    0.8,    TallBarTable;          %Object 7
+                -1.6,    1,   TallBarTable;         %Object 8
+                -1.6,   1.2,   TallBarTable;         %Object 9
             ]
             
             % This may change to a single number
-            IntermediateObjectLocationsArray = [
-                0, 0.45,        BarTableheight;                 %Object 1
+            IntermediateObjectLocations = [
+                -1.1, -0.4,   BarTableheight;                 %Object 1
             ]
             
             %Setting up the code to be able to run 3 different orders for
@@ -200,7 +165,6 @@ PlaceObject('cctv.ply',cctvXYZ)
             %% Use this to place each of the bottles in a position
 
             
-    
             for i = 1:NumberOfBottles
                 name = ['Bottle', num2str(i)];  
                 BottleArray{i} = IR_Object('brick.ply',name, InitialObjectLocationsArray(i,:)) %no colon so we keep it as a property
@@ -214,7 +178,7 @@ PlaceObject('cctv.ply',cctvXYZ)
             Steps = 50;
             %reduce the work by adding a guess
             PoseGuess = [-0.4, deg2rad(90), deg2rad(-45), deg2rad(-90), deg2rad(45),deg2rad(90), 0];
-            
+
             %input from GUI selects which drink should be ordered
             Drink = "Lemonade";
             BottleNumber = 1;
@@ -224,13 +188,17 @@ PlaceObject('cctv.ply',cctvXYZ)
             switch (Drink)
                 case "Lemonade"
                     BottleNumber = 1;
+                case "Solo"
+                    BottleNumber = 2;
                 otherwise 
                     display("Error: " + Drink + " - out of stock");
             end
 
+            BottleNumber = 8;
+
             %Find the bottle using its name and determine the relevant detai
             Bottle_ = BottleArray{length(BottleArray)-BottleNumber};
-            Bottle_Pose = Bottle_.model.base.T * trotx(pi) * transl(0,0,-0.15);
+            Bottle_Pose = Bottle_.model.base.T * trotz(pi) * transl(0.2,0,0.1);
             display("Bottle found: " + Drink + " at position " + BottleNumber);
  
             %Now that we have the bottle, we can determine all the other
@@ -242,15 +210,36 @@ PlaceObject('cctv.ply',cctvXYZ)
 
             for i = 1:Steps
                 %adjust and animate the postion of the gripper
-        
+                
+
                 %animate the arm
                 animate(r2.model,jointTrajectory(i,:));
+                
+                drawnow();
         
+            end
+            
+            disp("Robot arrived at order. Picking up now")
+            %Now we pick up the item and use place it in the intermediate
+            %position
+
+            %update pose guess
+            PoseGuess = [-0.4, deg2rad(90), deg2rad(-45), deg2rad(-90), deg2rad(45),deg2rad(90), 0];
+
+            StepPose = SE3(-1.1, -0.4,   BarTableheight + 0.15);
+            Robot2Intermediate = r2.model.ikcon(StepPose,PoseGuess);
+            jointTrajectory2 = jtraj(r2.model.getpos, Robot2Intermediate, Steps); %work out the path it takes
+
+            for i = 1:Steps
+                %adjust and animate the postion of the gripper
+
+                %animate the arm
+                animate(r2.model,jointTrajectory2(i,:));
+                
                 drawnow();
         
             end
 
-        
             % Use Robot B to move bottle from intermediate pose to final pose
         
         

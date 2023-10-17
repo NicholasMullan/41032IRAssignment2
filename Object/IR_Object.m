@@ -35,7 +35,7 @@ classdef IR_Object < handle
         self.model.faces = {[], faceData};
         self.model.points = {[], vertexData};
         self.model.base = pose;
-        self.model.base = self.model.base.T * trotz(pi/2);
+        self.model.base = self.model.base.T;
 
         hold on;
 
