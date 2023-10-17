@@ -64,9 +64,9 @@ hold on;
 rs= 3; %Roomsize
 wh= 3; % Wall height
 wb=0; %wall base
-
+fh=0.01; %floor height
 % Create a textured surface for the floor.
- surf([-rs,-rs;rs,rs] ,[-rs,rs;-rs,rs] ,[0.01,0.01;0.01,0.01],'CData',imread('ConcreteFloor.jpg'),'FaceColor','texturemap')
+ surf([-rs,-rs;rs,rs] ,[-rs,rs;-rs,rs] ,[fh,fh;fh,fh],'CData',imread('ConcreteFloor.jpg'),'FaceColor','texturemap')
 
 %
 % Define the axis limits for the plot.
@@ -84,14 +84,31 @@ surf([-rs, -rs; rs, rs],[-rs, -rs; -rs, -rs],[wb, wh; wb, wh],'CData',imread('Br
 surf([-rs, -rs; -rs, -rs],[-rs, -rs; rs, rs],[wb, wh; wb, wh],'CData',imread('Brickwall.jpg'),'FaceColor','texturemap')
 
 %'table
-table1XYZ = [0,0,0];
+table1XYZ = [0,0,fh];
 % Call the PlaceObject function to place the table.
 PlaceObject('tableBrown2.1x1.4x0.5m.ply',table1XYZ);
 %'table
-table2XYZ = [-1,1,0];
+table2XYZ = [-1,1,fh];
 % Call the PlaceObject function to place the table.
 PlaceObject('tableBrown2.1x1.4x0.5m.ply',table2XYZ);
 
+% Place fence
+fence1XYZ = [0,0,fh];
+%call the Place Object function to place fence
+PlaceObject('fence.ply',fence1XYZ)
+
+% Place fence
+fence2XYZ = [-1,0,fh];
+%call the Place Object function to place fence
+PlaceObject('fence.ply',fence2XYZ)
+
+%Place Fire Extinguisher
+fireXYZ = [-2.9,2.9,fh+0.5];
+%Placing fire extingisher
+PlaceObject ('fireExtinguisherElevated.ply',fireXYZ)
+
+%Place cctv camera
+cctvXYZ =
 %% ENVIRONMENT SET UP
 %Setting up enviroment 
 % Define the ENVIRONMENTXYZ position.
