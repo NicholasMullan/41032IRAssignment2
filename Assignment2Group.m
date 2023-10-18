@@ -1,5 +1,5 @@
 % Connor Keogh      13220482
-% Nicholas Mullan   11111111
+% Nicholas Mullan   13552361
 % Patrick Hore      13623943
 
 classdef Assignment2Group

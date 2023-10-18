@@ -28,7 +28,7 @@ classdef LinearLite6 < RobotBaseClass
             link(7) = Link([0 -0.339 0.013 0 0]);
             
             % Incorporate joint limits
-            link(1).qlim = [-0.8 -0.01];
+            link(1).qlim = [-1.6 -0.01];
             link(2).qlim = [-360 360]*pi/180;
             link(3).qlim = [-150 150]*pi/180;
             link(4).qlim = [-3.5 300]*pi/180;
