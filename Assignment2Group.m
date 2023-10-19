@@ -108,22 +108,31 @@ classdef Assignment2Group
         r1.model.base = r1.model.base * SE3(-0.5,-0.3,BarTableheight + OffsetTable);
         r1.model.animate(r1.model.getpos);
 
-        % gripper = Gripper();
-        % gripper.gripperbase_.base = r1.model.base.T * transl(0,0.70,-0.19) * troty(pi);
-        % gripper.leftFinger.base = r1.model.base.T  * (gripper.leftFinger.base.T * transl(0,0.70,-0.19)) * troty(pi);
-        % gripper.rightFinger.base = r1.model.base.T * (gripper.rightFinger.base.T * transl(0,0.70,-0.19)) * troty(pi);
-        % gripper.gripperbase_.animate(gripper.gripperbase_.getpos);
-        % gripper.leftFinger.animate(gripper.leftFinger.getpos);
-        % gripper.rightFinger.animate(gripper.rightFinger.getpos);
-        % 
-        % 
+        gripper1 = Gripper();
+        gripper1.gripperbase_.base = r1.model.base.T * transl(0,0.70,-0.19) * troty(pi);
+        gripper1.leftFinger.base = r1.model.base.T  * (gripper1.leftFinger.base.T * transl(0,0.70,-0.19)) * troty(pi);
+        gripper1.rightFinger.base = r1.model.base.T * (gripper1.rightFinger.base.T * transl(0,0.70,-0.19)) * troty(pi);
+        gripper1.gripperbase_.animate(gripper1.gripperbase_.getpos);
+        gripper1.leftFinger.animate(gripper1.leftFinger.getpos);
+        gripper1.rightFinger.animate(gripper1.rightFinger.getpos);
+         
+         
         %Robot 2 is custom robot
         hold on
         r2 = LinearLite6();
         %r2.model.base = r2.model.base * SE3(0,BarTableheight + OffsetTable,1.5);
         r2.model.base = r2.model.base *  SE3(-1.15,BarTableheight + OffsetTable,0);
-
         r2.model.animate(r2.model.getpos);
+
+        gripper2 = Gripper();
+        gripper2.gripperbase_.base = r1.model.base.T * transl(0,0.70,-0.19) * troty(pi);
+        gripper2.leftFinger.base = r1.model.base.T  * (gripper2.leftFinger.base.T * transl(0,0.70,-0.19)) * troty(pi);
+        gripper2.rightFinger.base = r1.model.base.T * (gripper2.rightFinger.base.T * transl(0,0.70,-0.19)) * troty(pi);
+        gripper2.gripperbase_.animate(gripper2.gripperbase_.getpos);
+        gripper2.leftFinger.animate(gripper2.leftFinger.getpos);
+        gripper2.rightFinger.animate(gripper2.rightFinger.getpos);
+
+
 
 
         end
@@ -220,8 +229,18 @@ classdef Assignment2Group
             end
             
             disp("Robot arrived at order. Picking up now")
-            %Now we pick up the item and use place it in the intermediate
-            %position
+            %Now we pick up the item and use place it in the intermediate position
+
+            % Close gripper
+            for i = 1:Steps 
+                gripper2.rightFinger.base = gripper2.rightFinger.base.T * troty(-0.2/Steps);
+                gripper2.leftFinger.base = gripper2.leftFinger.base.T * troty(0.2/Steps);
+                gripper2.rightFinger.animate(gripper2.leftFinger.getpos);
+                gripper2.leftFinger.animate(gripper2.rightFinger.getpos);
+
+                drawnow();
+
+            end
 
             %update pose guess
             PoseGuess = [-0.4, deg2rad(90), deg2rad(-45), deg2rad(-90), deg2rad(45),deg2rad(90), 0];
@@ -240,7 +259,39 @@ classdef Assignment2Group
         
             end
 
+            % Open gripper
+            for i = 1:Steps 
+                gripper2.rightFinger.base = gripper2.rightFinger.base.T * troty(0.2/Steps);
+                gripper2.leftFinger.base = gripper2.leftFinger.base.T * troty(-0.2/Steps);
+                gripper2.rightFinger.animate(gripper2.leftFinger.getpos);
+                gripper2.leftFinger.animate(gripper2.rightFinger.getpos);
+
+                drawnow();
+
+            end
+
             % Use Robot B to move bottle from intermediate pose to final pose
+            % Close gripper
+            for i = 1:Steps 
+                gripper1.rightFinger.base = gripper1.rightFinger.base.T * troty(-0.2/Steps);
+                gripper1.leftFinger.base = gripper1.leftFinger.base.T * troty(0.2/Steps);
+                gripper1.rightFinger.animate(gripper1.leftFinger.getpos);
+                gripper1.leftFinger.animate(gripper1.rightFinger.getpos);
+
+                drawnow();
+
+            end
+
+            % Close gripper
+            for i = 1:Steps 
+                gripper1.rightFinger.base = gripper1.rightFinger.base.T * troty(0.2/Steps);
+                gripper1.leftFinger.base = gripper1.leftFinger.base.T * troty(-0.2/Steps);
+                gripper1.rightFinger.animate(gripper1.leftFinger.getpos);
+                gripper1.leftFinger.animate(gripper1.rightFinger.getpos);
+
+                drawnow();
+
+            end
         
         
         
