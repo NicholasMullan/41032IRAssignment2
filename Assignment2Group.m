@@ -117,6 +117,7 @@ classdef Assignment2Group
         gripper1.rightFinger.animate(gripper1.rightFinger.getpos);
          
          
+         
         %Robot 2 is custom robot
         hold on
         r2 = LinearLite6();
