@@ -12,17 +12,17 @@ classdef Gripper < handle
 
 
     methods
-        function self = Gripper()
+        function self = Gripper(name)
             L1 = Link('alpha',0,'a',0,'d',0,'offset',0);
-            self.gripperbase_ = SerialLink(L1, 'name', 'gripbase');
+            self.gripperbase_ = SerialLink(L1, 'name', 'gripbase' + name);
 
             finger1Link = Link('alpha',0,'a',0,'d',0,'offset',0);
-            self.leftFinger = SerialLink(finger1Link, 'name', 'left');
+            self.leftFinger = SerialLink(finger1Link, 'name', 'left' + name);
             self.leftFinger.base = self.gripperbase_.base * SE3(0,0.1,0);
             % self.leftFinger.base = self.leftFinger.base.T * troty(0.1);
             
             finger2Link = Link('alpha',0,'a',0,'d',0,'offset',0);
-            self.rightFinger = SerialLink(finger2Link, 'name', 'right');  
+            self.rightFinger = SerialLink(finger2Link, 'name', 'right' + name);  
             self.rightFinger.base = self.gripperbase_.base * SE3(0,0.1,0);
             % self.rightFinger.base = self.rightFinger.base.T * troty(-0.1);
             
