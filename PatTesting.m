@@ -1,10 +1,9 @@
-  %% Set up Environment
+%% Set up Environment
         
         % initial object locations. 
         
         
-        function SetupEnvironment()
-        %% 
+       
         
         clf; %Clear Current Figure
         clear all; %Clear all variables from workspace
@@ -38,7 +37,8 @@
         PlaceObject('Environment.ply',[-0.5,1,fh]);
         
         %Placing Human
-        PlaceObject('personMaleOld.ply',[1,1,fh])
+        HumanXYZ=[1,2,fh];
+        PlaceObject('personMaleOld.ply',HumanXYZ)
         
         
         %Place cctv camera
@@ -49,33 +49,40 @@
                 
       
 
-%% testing light curtain
+
+        % testing light curtain
 
 
 input('\nlight curtain demo')
+%light curtain 1
+[y,z] = meshgrid(-2:0.01:2, 0:0.01:2);  %setting location of meshgrid
+x = -0.12 * ones(size(y));
 
-[x,z] = meshgrid(-1.5:0.01:1.5, 0:0.01:1);  %setting location of meshgrid
-y(1:size(x,1),1:1) = -0.5;
 lightCurtainS1 = surf(x,y,z,'FaceAlpha',0.1,'EdgeColor','none');
+%Light curtain 2
+[y,z] = meshgrid(-2:0.01:2, 0:0.01:2);  %setting location of meshgrid
+x = 0.12 * ones(size(y));
 
-[x,z] = meshgrid(-1.5:0.01:1.5, 0:0.01:1);  %setting location of meshgrid
-y(1:size(x,1),1:1) = 0.5;
 lightCurtainS2 = surf(x,y,z,'FaceAlpha',0.1,'EdgeColor','none');
 
 [f,v,data] = plyread('personMaleOld.ply','tri');
-kidVertices = v;
+ManVertices = v;
 
-input('\nMove kid into light curtain')
+input('\nMove Man into light curtain')
 
-kid.man.base = transl(-1,-0.5,0);
-kid.man.animate(kid.man.getpos);
+%Intial Man Position
+InitalHumanPosition=HumanXYZ;
+HumanTransform = transl(InitalHumanPosition);
+%HumanTransform.animate(InitalHumanPosition.getpos)
+%kid.man.base = transl(-1,-0.5,0);
+%kid.man.animate(kid.man.getpos);
 pause(0.01);
 
-kidVertices(:,1) = kidVertices(:,1) + kid.man.base(1,4);
-kidVertices(:,2) = kidVertices(:,2) + kid.man.base(2,4);
-kidVertices(:,3) = kidVertices(:,3) + kid.man.base(3,4);
+ManVertices(:,1) = ManVertices(:,1) + HumanTransform(1,4);
+ManVertices(:,2) = ManVertices(:,2) + HumanTransform(2,4);
+ManVertices(:,3) = ManVertices(:,3) + HumanTransform(3,4);
 
-if max(kidVertices(:,2)) >= -0.5
+if max(ManVertices(:,2)) >= -0.5
     fprintf("Light Curtain has been activated")
     
 
