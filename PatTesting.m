@@ -50,7 +50,7 @@
       
 
 
-        % testing light curtain
+        %% testing light curtain
 
 
 input('\nlight curtain demo')
@@ -87,3 +87,41 @@ if max(ManVertices(:,2)) >= -0.5
     
 
 end
+%%  Define the available bottle colors
+
+% Load the Can.ply file
+plyData = pcread('Can.ply') % Use pcread for point cloud data
+
+% Extract intensity values (assuming you have intensity data)
+intensityValues = plyData.Intensity;
+
+% Define a colormap based on intensity values
+colormap = jet(124); % You can choose any colormap
+
+% Normalize the intensity values to match the colormap
+intensityNormalized = (intensityValues - min(intensityValues)) / (max(intensityValues) - min(intensityValues));
+intensityIndices = ceil(intensityNormalized * 256);
+
+% Assign colors based on the colormap
+colors = colormap(intensityIndices, :);
+
+% Assign the calculated colors to the point cloud
+plyData.Color = colors;
+
+% Visualize the point cloud
+pcshow(plyData);
+
+% Load your point cloud data
+plyData = pcread('Can.ply');
+
+% Update the color information as mentioned in the previous answer
+
+% Save the modified point cloud to a new .ply file
+outputFileName = 'modified_point_cloud.ply';
+pcwrite(plyData, outputFileName);
+
+% Now, your modified point cloud is saved in 'modified_point_cloud.ply'
+
+% Create a new figure and plot the point cloud with the new color
+
+PlaceObject ('modified_point_cloud.ply',[0,0,0]);

@@ -198,7 +198,7 @@ classdef Assignment2Group
             
             for i = 1:NumberOfBottles
                 name = ['Bottle', num2str(i)];  
-                BottleArray{i} = IR_Object('brick.ply',name, InitialObjectLocationsArray(i,:)) %no colon so we keep it as a property
+                BottleArray{i} = IR_Object('CANBlue.ply',name, InitialObjectLocationsArray(i,:)) %no colon so we keep it as a property
             end
 
         end
