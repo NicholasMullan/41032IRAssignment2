@@ -87,7 +87,7 @@ classdef Assignment2Group
         
         
         %Place cctv camera
-        cctvXYZ=[-rs-0.1,-rs,wh-0.5];
+        cctvXYZ=[-rs+0.1,-rs,wh-0.5];
         %Placing CCTV
         PlaceObject('cctv.ply',cctvXYZ);
         
