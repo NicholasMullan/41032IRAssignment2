@@ -22,15 +22,15 @@ classdef LinearLite6 < RobotBaseClass
         function CreateModel(self)   
             % Create the Robot2 model mounted on a linear rail
             link(1) = Link([pi 0 0 pi/2 1]); % PRISMATIC Link
-            link(2) = Link([0 0.3165 0 0 0]);
-            link(3) = Link([0 0 0 pi/2 0]);
-            link(4) = Link([0 0 0 pi 0]);
-            link(5) = Link([0 0 0.09 -pi/2 0]);
-            link(6) = Link([0 -0.013 0 pi/2 0]);
-            link(7) = Link([0 0 0 pi/2 0]);
+            link(2) = Link([0 0.3165 0 pi/2 0]);
+            link(3) = Link([0 0 -0.198 0 0]);
+            link(4) = Link([0 0 0.09 pi/2 0]);
+            link(5) = Link([0 -0.227 0 pi/2 0]);
+            link(6) = Link([0 0 0 pi/2 0]);
+            link(7) = Link([0 0 0 0 0]);
             
             % Incorporate joint limits
-            link(1).qlim = [-1.6 -0.2];
+            link(1).qlim = [-0.8 -0.1];
             link(2).qlim = [-360 360]*pi/180;
             link(3).qlim = [-150 150]*pi/180;
             link(4).qlim = [-3.5 300]*pi/180;
@@ -39,7 +39,9 @@ classdef LinearLite6 < RobotBaseClass
             link(7).qlim = [-360 360]*pi/180;
 
             % Offsets 
-            link(4).offset = pi;
+            link(3).offset = -pi/2;
+            link(4).offset = pi/2;
+            link(5).offset = pi;
             link(7).offset = -pi/2;
 
             
