@@ -88,11 +88,9 @@ if max(ManVertices(:,2)) >= -0.5
 
 end
 %%  Define the available bottle colors
-% Load the PLY file
-plydata = plyread('CanBlue.ply')
-
-disp(plydata)
-
-% Now 'colors' contains the RGB color information for each vertex
+     hold on;
 
 PlaceObject ('CanBlue.ply',[1,1,1]);
+PlaceObject ('CanRed.ply',[2,1,1]);
+PlaceObject ('CanYellow.ply',[3,1,1]);
+PlaceObject ('CanGreen.ply',[4,1,1]);
