@@ -197,8 +197,11 @@ classdef Assignment2Group
 
             
             for i = 1:NumberOfBottles
-                name = ['Bottle', num2str(i)];  
-                BottleArray{i} = IR_Object('CanBlue.ply',name, InitialObjectLocationsArray(i,:)) %no colon so we keep it as a property
+                name = ['Lemonade', num2str(i)]; 
+                 % Define the color as an RGB value (e.g., [R, G, B])
+    color = [0, 0, 1]; % This is blue
+
+                BottleArray{i} = IR_Object('CanYellow.ply',name, InitialObjectLocationsArray(i,:),color) %no colon so we keep it as a property
             end
 
         end

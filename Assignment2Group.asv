@@ -87,7 +87,7 @@ classdef Assignment2Group
         
         
         %Place cctv camera
-        cctvXYZ=[-rs-0.1,-rs,wh-0.5];
+        cctvXYZ=[-rs+0.1,-rs,wh-0.5];
         %Placing CCTV
         PlaceObject('cctv.ply',cctvXYZ);
         
@@ -197,8 +197,8 @@ classdef Assignment2Group
 
             
             for i = 1:NumberOfBottles
-                name = ['Bottle', num2str(i)];  
-                BottleArray{i} = IR_Object('brick.ply',name, InitialObjectLocationsArray(i,:)) %no colon so we keep it as a property
+                name = ['Lemonade', num2str(i)];  
+                BottleArray{i} = IR_Object('CanYellow.ply',name, InitialObjectLocationsArray(i,:),color) %no colon so we keep it as a property
             end
 
         end
@@ -233,7 +233,8 @@ classdef Assignment2Group
             %Find the bottle using its name and determine the relevant detai
             Bottle_ = BottleArray{length(BottleArray)-BottleNumber};
             Bottle_Pose = Bottle_.model.base.T * transl(0.3, 0, -0.5) * trotz(pi) * troty(pi/3) * trotx(pi);
-            Bottle_Pose = transl(-1.6,   1.2,   TallBarTable) * troty(pi/3) * transl(0,0,0.55);
+            Bottle_Pose = transl(-1.6,   1.2,   TallBarTable) * troty(-pi/2)% * transl(0,0,-0.55);
+            % @ NICK CAN YOU LOOK OVER THIS PLEASE??? 
 
             display("Bottle found: " + Drink + " at position " + BottleNumber);
  
