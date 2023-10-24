@@ -42,7 +42,7 @@
         
         
         %Place cctv camera
-        cctvXYZ=[-rs-0.1,-rs,wh-0.5];
+        cctvXYZ=[-rs+0.1,-rs,wh-0.5];
         %Placing CCTV
         PlaceObject('cctv.ply',cctvXYZ)
         
@@ -88,19 +88,10 @@ if max(ManVertices(:,2)) >= -0.5
 
 end
 %%  Define the available bottle colors
+     hold on;
 
-% Load the Can.ply file
-plyData = pcread('Can.ply') % Use pcread for point cloud data
-
-
-
-% Set the entire point cloud color to red
-redColor = uint8([255, 255, 0]); % Red color (RGB values)
-colorMatrix = repmat(redColor, plyData.Count, 1); % Create a color matrix
-
-% Apply the red color to the point cloud
-plyData.Color = colorMatrix;
-
-% Create a new figure and plot the point cloud with the new color
-plywrite('Can.ply', plyData);
-PlaceObject ('Can.ply',[0,0,0]);
+PlaceObject ('CanBlue.ply',[1,1,1])
+ply
+PlaceObject ('CanRed.ply',[2,1,1]);
+PlaceObject ('CanYellow.ply',[3,1,1]);
+PlaceObject ('CanGreen.ply',[4,1,1]);

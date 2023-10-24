@@ -90,7 +90,8 @@ end
 %%  Define the available bottle colors
      hold on;
 
-PlaceObject ('CanBlue.ply',[1,1,1]);
+PlaceObject ('CanBlue.ply',[1,1,1])
+plyread('CanBlue.ply')
 PlaceObject ('CanRed.ply',[2,1,1]);
 PlaceObject ('CanYellow.ply',[3,1,1]);
 PlaceObject ('CanGreen.ply',[4,1,1]);
