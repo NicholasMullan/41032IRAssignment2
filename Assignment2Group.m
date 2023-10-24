@@ -7,19 +7,20 @@ classdef Assignment2Group
     properties
         %% Set the initial position for each Object
 
-        
         % Define the height of the bar / table here for use of robot placement
         BarTableheight = 0.74; %%(800mm) 
+        TallBarTable = 0.95;
         OffsetTable = 0.02;
 
-        %Work out how to set the bottle locations in bottle setup function
-        InitialObjectLocationsArray =       [0,0,0];
-        IntermediateObjectLocations =       [0,0,0];
-        FinalObjectLocationsArray =         [0,0,0];
 
-        NumberOfBottles = 9; %how many do we want to simulate
-        %BottleArray = cell(NumberOfBottles, 1);
-        BottleColours = {"Lemonade", "Coca-Cola", "Solo", "Fanta" }
+        bottleTypes = {
+                'CanYellow.ply';
+                'CanRed.ply';
+                'CanBlue.ply';
+                'CanGreen.ply';
+                }
+        arraySize = size(bottleTypes());
+        NumberOfBottles = arraySize(1) %how many do we want to simulate
 
 
     end
@@ -29,7 +30,7 @@ classdef Assignment2Group
         methods
         function main(self)
             %% The main function for this setup
-            ClearAndClose();
+            self.ClearAndClose(self);
             self.SetupEnvironment();
             self.SetupRobots();
             self.SetArrayValues();
@@ -40,7 +41,7 @@ classdef Assignment2Group
         
         end
         
-        function ClearAndClose()
+        function ClearAndClose(self)
             %% Reset simulation environment
             clc;
             clf;
@@ -132,42 +133,36 @@ classdef Assignment2Group
             r2.model.links(i).qlim = deg2rad([-180 180]);
         end
 
-        %Set up gripper 2
+        % Set up gripper 2
         gripper2 = Gripper("LinearLiteGripper");
 
-        gripper2.gripperbase_.base = r2.model.fkineUTS(r2.model.getpos) * trotx(pi) * trotz(pi/2) * transl(0,0,-0.05);
+        gripper2.gripperbase_.base = r2.model.fkineUTS(r2.model.getpos) * trotz(pi/2) * transl(0,0,0.05);
         gripper2.leftFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0);
         gripper2.rightFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0);
-        
-        %gripper2.gripperbase_.base = r2.model.base.T * transl(0,0,0) * troty(pi) * trotx(pi/2);
-        %gripper2.leftFinger.base = r2.model.base.T  * (gripper2.leftFinger.base.T * transl(0,0,0)) * troty(pi) * trotx(pi/2);
-        %gripper2.rightFinger.base = r2.model.base.T * (gripper2.rightFinger.base.T * transl(0,0,0)) * troty(pi) * trotx(pi/2);
         
         gripper2.gripperbase_.animate(gripper2.gripperbase_.getpos);
         gripper2.leftFinger.animate(gripper2.leftFinger.getpos);
         gripper2.rightFinger.animate(gripper2.rightFinger.getpos);
-
-
-
 
         end
         
         function SetArrayValues()         
             %% Set up bottle initial locations
             % note no orientation considering bottle is mirrored about Z-axis.             
-            TallBarTable = 0.95;
+
+            StartingX = -1.5;
 
             InitialObjectLocationsArray = [
                 %Location XYZ   
-                -1.6,    -0.4,    TallBarTable;           %Object 1
-                -1.6,    -0.2,   TallBarTable;          %Object 2
-                -1.6,    0,   TallBarTable;          %Object 3
-                -1.6,    0.2,    TallBarTable;          %Object 4
-                -1.6,    0.4,   TallBarTable;         %Object 5
-                -1.6,    0.6,   TallBarTable;         %Object 6
-                -1.6,    0.8,    TallBarTable;          %Object 7
-                -1.6,    1,   TallBarTable;         %Object 8
-                -1.6,   1.2,   TallBarTable;         %Object 9
+                StartingX,    -0.4,    TallBarTable;           %Object 1
+                StartingX,    -0.2,   TallBarTable;          %Object 2
+                StartingX,    0,   TallBarTable;          %Object 3
+                StartingX,    0.2,    TallBarTable;          %Object 4
+                StartingX,    0.4,   TallBarTable;         %Object 5
+                StartingX,    0.6,   TallBarTable;         %Object 6
+                StartingX,    0.8,    TallBarTable;          %Object 7
+                StartingX,    1,   TallBarTable;         %Object 8
+                StartingX,   1.2,   TallBarTable;         %Object 9
             ]
             
             % This may change to a single number
@@ -196,9 +191,13 @@ classdef Assignment2Group
             %% Use this to place each of the bottles in a position
 
             
+
             for i = 1:NumberOfBottles
-                name = ['Bottle', num2str(i)];  
-                BottleArray{i} = IR_Object('CanBlue.ply',name, InitialObjectLocationsArray(i,:)) %no colon so we keep it as a property
+                name = ['Bottle', num2str(i)]
+
+                type = [bottleTypes{i}]
+                
+                BottleArray{i} = IR_Object(type,name, InitialObjectLocationsArray(i,:)) %no colon so we keep it as a property
             end
 
         end
@@ -208,9 +207,8 @@ classdef Assignment2Group
             %% 
             Steps = 50;
             %reduce the work by adding a guess
-            PoseGuess = [-0.4, deg2rad(90), deg2rad(-45), deg2rad(-90), deg2rad(45),deg2rad(90), 0];
-            PoseGuess = [0, 0, 0, 0, 0,0, 0];
-            
+            PoseGuess = [-0.4145, 1.0969, -0.5204, -1.6201, -1.3009, 1.1764, 0.6240];
+
             %input from GUI selects which drink should be ordered
             Drink = "Fanta";
             BottleNumber = 1;
@@ -231,10 +229,8 @@ classdef Assignment2Group
 
 
             %Find the bottle using its name and determine the relevant detai
-            Bottle_ = BottleArray{length(BottleArray)-BottleNumber};
-            Bottle_Pose = Bottle_.model.base.T * transl(0.3, 0, -0.5) * trotz(pi) * troty(pi/3) * trotx(pi);
-            Bottle_Pose = transl(-1.6,   1.2,   TallBarTable) * troty(-pi/2)% * transl(0,0,-0.55);
-            % @ NICK CAN YOU LOOK OVER THIS PLEASE??? 
+            Bottle_ = BottleArray{length(BottleArray)-BottleNumber+1};
+            
 
             display("Bottle found: " + Drink + " at position " + BottleNumber);
  
@@ -242,12 +238,22 @@ classdef Assignment2Group
             %information through this
         
             % Use Robot 2 to move bottle from initial pose to intermediate pose
+            Bottle_Pose = Bottle_.model.base.T * troty(-pi/2) * transl(0.1,0,-.24)
             robot2Bottle = r2.model.ikcon(Bottle_Pose,PoseGuess)
             jointTrajectory = jtraj(r2.model.getpos, robot2Bottle, Steps) %work out the path it takes
 
-            for i = 1:Steps
+            PoseGuess = [ -0.4049    0.8781   -0.6030   -1.4791   -1.1850    0.9801    0.6300];
+            Bottle_Pose = Bottle_.model.base.T * troty(-pi/2) * transl(0.1,0,-0.18)
+            robot2Bottle = r2.model.ikcon(Bottle_Pose,PoseGuess)
+            creepJointTrajectory = jtraj(jointTrajectory(50,:), robot2Bottle, Steps) %work out the path it takes
+
+            jointTrajectory = [jointTrajectory; creepJointTrajectory ]
+            jtrajSize = size(jointTrajectory)
+
+            for i = 1:jtrajSize(1)
                 %adjust and animate the postion of the gripper
-                gripper2.gripperbase_.base = r2.model.fkineUTS(jointTrajectory(i,:)) * trotx(pi) * trotz(pi/2) * transl(0,0,-0.05);
+
+                gripper2.gripperbase_.base = r2.model.fkineUTS(jointTrajectory(i,:)) * trotz(pi/2) * transl(0,0,0.05);
                 gripper2.leftFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0);
                 gripper2.rightFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0);
                 
@@ -258,15 +264,13 @@ classdef Assignment2Group
                 %animate the arm
                 animate(r2.model,jointTrajectory(i,:));
                 
-                
                 drawnow();
         
             end
-            
-            disp("Robot arrived at order. Picking up now")
-            %Now we pick up the item and use place it in the intermediate position
 
-            %% Close gripper
+disp("Robot arrived at bottle, closing gripper")
+
+            % Close gripper
             for i = 1:Steps 
                 gripper2.rightFinger.base = gripper2.rightFinger.base.T * troty(-0.1/Steps);
                 gripper2.leftFinger.base = gripper2.leftFinger.base.T * troty(0.1/Steps);
@@ -276,20 +280,32 @@ classdef Assignment2Group
                 drawnow();
 
             end
+disp("Bottle picked up, moving to intermediate position")
 
-            % update pose guess
-            %PoseGuess = [-0.4, deg2rad(90), deg2rad(-45), deg2rad(-90), deg2rad(45),deg2rad(90), 0];
+            %Movement up after picking bottle
+            Bottle_Pose = Bottle_.model.base.T * troty(-pi/2) * transl(0.15,0,-.24)
+            robot2Bottle = r2.model.ikcon(Bottle_Pose,PoseGuess)
+            jointTrajectory = jtraj(r2.model.getpos, robot2Bottle, Steps) %work out the path it takes
 
-            StepPose = SE3(IntermediateObjectLocations).T;
-
+             %Movement to near intermediate position
+            PoseGuess = [0.0420    1.3929   -1.4104   -0.9893    0.2391    0.8434    1.7315];
+            StepPose = SE3(IntermediateObjectLocations).T * troty(-pi/2) * trotx(pi/2) * transl(0.14,0,0);
             Robot2Intermediate = r2.model.ikcon(StepPose,PoseGuess);
-            jointTrajectory = jtraj(r2.model.getpos, Robot2Intermediate, Steps); %work out the path it takes
+            jointTrajectory2 = jtraj(jointTrajectory(50,:), Robot2Intermediate, Steps); %work out the path it takes
 
-            for i = 1:Steps
+            %creep speed placement at intermediate position
+            StepPose = SE3(IntermediateObjectLocations).T * troty(-pi/2) * trotx(pi/2) * transl(0.12,0,0);
+            Robot2Intermediate = r2.model.ikcon(StepPose,PoseGuess);
+            jointTrajectory3 = jtraj(jointTrajectory2(50,:), Robot2Intermediate, Steps); %work out the path it takes
+
+            jointTrajectory = [jointTrajectory; jointTrajectory2; jointTrajectory3];
+            jtrajSize = size(jointTrajectory)
+
+            for i = 1:jtrajSize(1)
                 %adjust and animate the postion of the gripper
-                gripper2.gripperbase_.base = r2.model.fkineUTS(jointTrajectory(i,:)) * trotx(pi) * trotz(pi/2) * transl(0,0,-0.05);
-                gripper2.leftFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0);
-                gripper2.rightFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0);
+                gripper2.gripperbase_.base = r2.model.fkineUTS(jointTrajectory(i,:)) * trotz(pi/2) * transl(0,0,0.05);
+                gripper2.leftFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0) * troty(0.1);
+                gripper2.rightFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0) * troty(-0.1);
 
                 gripper2.gripperbase_.animate(gripper2.gripperbase_.getpos);
                 gripper2.leftFinger.animate(gripper2.leftFinger.getpos);
@@ -298,15 +314,17 @@ classdef Assignment2Group
                 %animate the arm
                 animate(r2.model,jointTrajectory(i,:));
 
-                Bottle_.model.base = r2.model.fkineUTS(jointTrajectory(i,:))
-                Bottle_.model.base = Bottle_.model.base.T * transl(0,0,-0.10); % Give offset from gripper
+                Bottle_.model.base = r2.model.fkineUTS(jointTrajectory(i,:)) * troty(pi/2)  * transl(-0.18,0,-0.1)
+                Bottle_.model.base = Bottle_.model.base.T * transl(0,0,0); % Give offset from gripper
                 animate(Bottle_.model,jointTrajectory(i,:));
 
                 drawnow();
         
             end
+disp("Bottle at intermediate position, opening grippper")
 
-            % Open gripper
+
+            %%  Open gripper
             for i = 1:Steps 
                 gripper2.rightFinger.base = gripper2.rightFinger.base.T * troty(0.2/Steps);
                 gripper2.leftFinger.base = gripper2.leftFinger.base.T * troty(-0.2/Steps);
@@ -316,7 +334,7 @@ classdef Assignment2Group
                 drawnow();
 
             end
-
+%% 
             StepPose = SE3(Robot2ResetPose);
             Robot2Reset = r2.model.ikcon(StepPose,PoseGuess);
             jointTrajectory = jtraj(r2.model.getpos, Robot2Reset, Steps); %work out the path it takes
@@ -324,7 +342,7 @@ classdef Assignment2Group
             %Move robot 2 out of the road
             for i = 1:Steps
                 %adjust and animate the postion of the gripper
-                gripper2.gripperbase_.base = r2.model.fkineUTS(jointTrajectory(i,:)) * trotx(pi) * trotz(pi/2) * transl(0,0,-0.05);
+                gripper2.gripperbase_.base = r2.model.fkineUTS(jointTrajectory(i,:)) * trotz(pi/2) * transl(0,0,0.05);
                 gripper2.leftFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0) * troty(0.2);
                 gripper2.rightFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0) * troty(0.2);
 
