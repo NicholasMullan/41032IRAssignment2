@@ -194,8 +194,7 @@ classdef Assignment2Group
         end
     
         %% GUI Opened
-        
-
+        gui = GUI();
 
         %% Move objects
         function CollectOrderFromCustomer(Num)
@@ -205,7 +204,7 @@ classdef Assignment2Group
             PoseGuess = [-0.4145, 1.0969, -0.5204, -1.6201, -1.3009, 1.1764, 0.6240];
 
             %input from GUI selects which drink should be ordered
-            % Drink = "Fanta";
+            Drink = "Fanta";
             % BottleNumber = 2;
 
             % Based on the drink choice, set the initial location in this
@@ -217,12 +216,12 @@ classdef Assignment2Group
                     BottleNumber = 2;
                 case "Fanta"
                     BottleNumber = 3;
-                case "Coca Cola"
+                case "CocaCola"
                     BottleNumber = 4;
                 otherwise 
                     display("Error: " + Drink + " - out of stock");
             end
-                        BottleNumber = 1;
+                        %BottleNumber = 1;
 
 
             %Find the bottle using its name and determine the relevant detai
