@@ -5,8 +5,11 @@ function CollectOrderFromCustomer(Drink)
             %reduce the work by adding a guess
             PoseGuess = [-0.4145, 1.0969, -0.5204, -1.6201, -1.3009, 1.1764, 0.6240];
 
+            FingerRotationOpen = 0.1;
+            FingerRotationClosed = -0.1;
+
             %input from GUI selects which drink should be ordered
-            Drink = "Fanta";
+            Drink = "Solo";
             % BottleNumber = 2;
 
             % Based on the drink choice, set the initial location in this
@@ -25,11 +28,9 @@ function CollectOrderFromCustomer(Drink)
             end
                         %BottleNumber = 1;
 
-
             %Find the bottle using its name and determine the relevant detai
             Bottle_ = BottleArray{length(BottleArray)-BottleNumber+1};
             
-
             display("Bottle found: " + Drink + " at position " + BottleNumber);
  
             %Now that we have the bottle, we can determine all the other
@@ -50,36 +51,13 @@ function CollectOrderFromCustomer(Drink)
             jointTrajectory = [jointTrajectory; creepJointTrajectory ];
             jtrajSize = size(jointTrajectory);
 
-            for i = 1:jtrajSize(1)
-                %adjust and animate the postion of the gripper
-
-                gripper2.gripperbase_.base = r2.model.fkineUTS(jointTrajectory(i,:)) * trotz(pi/2) * transl(0,0,0.05);
-                gripper2.leftFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0);
-                gripper2.rightFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0);
-                
-                gripper2.gripperbase_.animate(gripper2.gripperbase_.getpos);
-                gripper2.leftFinger.animate(gripper2.leftFinger.getpos);
-                gripper2.rightFinger.animate(gripper2.rightFinger.getpos);
-
-                %animate the arm
-                animate(r2.model,jointTrajectory(i,:));
-                
-                drawnow();
-        
-            end
+            MoveRobot(r2, gripper2, false, jointTrajectory, NaN);
 
 disp("Robot arrived at bottle, closing gripper")
 
             % Close gripper
-            for i = 1:Steps 
-                gripper2.rightFinger.base = gripper2.rightFinger.base.T * troty(-0.1/Steps);
-                gripper2.leftFinger.base = gripper2.leftFinger.base.T * troty(0.1/Steps);
-                gripper2.rightFinger.animate(gripper2.leftFinger.getpos);
-                gripper2.leftFinger.animate(gripper2.rightFinger.getpos);
+            AlterGripper(gripper2, true); %false to open gripper, true to close
 
-                drawnow();
-
-            end
 disp("Bottle picked up, moving to intermediate position")
 
             %creep Movement up after picking bottle
@@ -101,39 +79,13 @@ disp("Bottle picked up, moving to intermediate position")
             jointTrajectory = [jointTrajectory; jointTrajectory2; jointTrajectory3];
             jtrajSize = size(jointTrajectory);
 
-            for i = 1:jtrajSize(1)
-                %adjust and animate the postion of the gripper
-                gripper2.gripperbase_.base = r2.model.fkineUTS(jointTrajectory(i,:)) * trotz(pi/2) * transl(0,0,0.05);
-                gripper2.leftFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0) * troty(0.1);
-                gripper2.rightFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0) * troty(-0.1);
-
-                gripper2.gripperbase_.animate(gripper2.gripperbase_.getpos);
-                gripper2.leftFinger.animate(gripper2.leftFinger.getpos);
-                gripper2.rightFinger.animate(gripper2.rightFinger.getpos);
-
-                %animate the arm
-                animate(r2.model,jointTrajectory(i,:));
-
-                Bottle_.model.base = r2.model.fkineUTS(jointTrajectory(i,:)) * troty(pi/2)  * transl(-0.18,0,-0.1)
-                animate(Bottle_.model,jointTrajectory(i,:));
-
-                drawnow();
-     
-            end
+            MoveRobot(r2, gripper2, true, jointTrajectory,Bottle_);
 
 disp("Bottle at intermediate position, opening grippper")
 
-
             %  Open gripper
-            for i = 1:Steps 
-                gripper2.rightFinger.base = gripper2.rightFinger.base.T * troty(0.1/Steps);
-                gripper2.leftFinger.base = gripper2.leftFinger.base.T * troty(-0.1/Steps);
-                gripper2.rightFinger.animate(gripper2.leftFinger.getpos);
-                gripper2.leftFinger.animate(gripper2.rightFinger.getpos);
+            AlterGripper(gripper2, false); %false to open gripper, true to close
 
-                drawnow();
-
-            end
 
 disp("Moving robot out of the road")
             % creep away from bottle
@@ -149,28 +101,13 @@ disp("Moving robot out of the road")
             
             jointTrajectory = [jointTrajectory; jointTrajectory2];
             jtrajSize = size(jointTrajectory);
-            
-            %Move robot 2 out of the road
-            for i = 1:jtrajSize
-                %adjust and animate the postion of the gripper
-                gripper2.gripperbase_.base = r2.model.fkineUTS(jointTrajectory(i,:)) * trotz(pi/2) * transl(0,0,0.05);
-                gripper2.leftFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0);
-                gripper2.rightFinger.base = gripper2.gripperbase_.base.T * transl(0,0.1,0);
 
-                gripper2.gripperbase_.animate(gripper2.gripperbase_.getpos);
-                gripper2.leftFinger.animate(gripper2.leftFinger.getpos);
-                gripper2.rightFinger.animate(gripper2.rightFinger.getpos);
-
-                %animate the arm
-                animate(r2.model,jointTrajectory(i,:));
-                
-                drawnow();
-        
-            end
-            %holdPos = Bottle_.model.base;
-
-%Bottle_.model.base = holdPos;
-%animate(Bottle_.model,Bottle_.model.getpos);
+            MoveRobot(r2, gripper2, false, jointTrajectory, NaN);
+% 
+% holdPos = Bottle_.model.base;
+% 
+% Bottle_.model.base = holdPos;
+% animate(Bottle_.model,Bottle_.model.getpos);
 
 disp("Robot 1 moving into position")
             % Use Robot 1 to move bottle from intermediate pose to final pose
@@ -181,7 +118,7 @@ disp("Robot 1 moving into position")
 
             %Creep to bottle position
             PoseGuess = [deg2rad(215) , deg2rad(-129) ,deg2rad(-80),deg2rad(210),deg2rad(-60),0];
-            Bottle_Pose = Bottle_.model.base.T * trotx(pi/2) * troty(pi) * transl(0,0.1,-0.1);
+            Bottle_Pose = Bottle_.model.base.T * trotx(pi/2) * troty(pi) * transl(0,0.09,-0.08);
             Robot1Intermediate = r1.model.ikcon(Bottle_Pose,PoseGuess);
             jointTrajectory2 = jtraj(jointTrajectory(50,:), Robot1Intermediate, Steps/2); %work out the path it takes
 
@@ -189,33 +126,14 @@ disp("Robot 1 moving into position")
             jtrajSize = size(jointTrajectory);
 
             %Move robot A out of the road
-            for i = 1:jtrajSize
-                %adjust and animate the postion of the gripper
-                gripper1.gripperbase_.base = r1.model.fkineUTS(jointTrajectory(i,:)) * transl(0,0,-0.05);
-                gripper1.leftFinger.base = gripper1.gripperbase_.base.T * transl(0,0.1,0);
-                gripper1.rightFinger.base = gripper1.gripperbase_.base.T * transl(0,0.1,0);
-
-                gripper1.gripperbase_.animate(gripper1.gripperbase_.getpos);
-                gripper1.leftFinger.animate(gripper1.leftFinger.getpos);
-                gripper1.rightFinger.animate(gripper1.rightFinger.getpos);
-
-                %animate the arm
-                animate(r1.model,jointTrajectory(i,:));
-                
-                drawnow();
-        
-            end
+            MoveRobot(r1, gripper1, false, jointTrajectory, NaN );
+            
+            
 disp("Robot 1 in position. Gripper closing")
-r1.model.getpos
-            % Close gripper
-            for i = 1:Steps 
-                gripper1.leftFinger.base = gripper1.leftFinger.base.T * troty(0.1/Steps);
-                gripper1.rightFinger.base = gripper1.rightFinger.base.T * troty(-0.1/Steps);
-                gripper1.rightFinger.animate(gripper1.leftFinger.getpos);
-                gripper1.leftFinger.animate(gripper1.rightFinger.getpos);
 
-                drawnow();
-            end
+            % Close gripper
+            AlterGripper(gripper1, true); %false to open gripper, true to close
+            
 
 disp("Robot 1 gripper closed. Moving to final position")            
             %Creep move slightly up
@@ -238,143 +156,79 @@ disp("Robot 1 gripper closed. Moving to final position")
             jointTrajectory = [jointTrajectory; jointTrajectory2];
             jtrajSize = size(jointTrajectory);
 
-            %Move robot 1 to the final position
-            for i = 1:jtrajSize(1)
-                %adjust and animate the postion of the gripper
-                gripper1.gripperbase_.base = r1.model.fkineUTS(jointTrajectory(i,:)) * transl(0,0,-0.05);
-                gripper1.leftFinger.base = gripper1.gripperbase_.base.T * transl(0,0.1,0) * troty(0.1);
-                gripper1.rightFinger.base = gripper1.gripperbase_.base.T * transl(0,0.1,0) * troty(-0.1);
+            MoveRobot(r1, gripper1, true, jointTrajectory, Bottle_ );
 
-                gripper1.gripperbase_.animate(gripper1.gripperbase_.getpos);
-                gripper1.leftFinger.animate(gripper1.leftFinger.getpos);
-                gripper1.rightFinger.animate(gripper1.rightFinger.getpos);
-
-                %Bottle_.model.base = r2.model.fkineUTS(jointTrajectory(i,:)) * troty(pi/2)  * transl(-0.18,0,-0.1)
-
-                Bottle_.model.base = r1.model.fkineUTS(jointTrajectory(i,:)) * trotx(-pi/2)  * transl(0,-0.08,-0.09);
-                animate(Bottle_.model,jointTrajectory(i,:));
-
-                %animate the arm
-                animate(r1.model,jointTrajectory(i,:));
-                
-                drawnow();
-        
-            end
-r1.model.getpos
+           
 disp("Final position reached. Opening gripper 1")  
-%%
-r1.model.getpos
-r1.model.teach(r1.model.getpos)
 
-
-            %%
             % Open gripper
-            for i = 1:Steps 
-                gripper1.rightFinger.base = gripper1.rightFinger.base.T * troty(0.2/Steps);
-                gripper1.leftFinger.base = gripper1.leftFinger.base.T * troty(-0.2/Steps);
-                gripper1.rightFinger.animate(gripper1.leftFinger.getpos);
-                gripper1.leftFinger.animate(gripper1.rightFinger.getpos);
+            AlterGripper(gripper1, false); %false to open gripper, true to close
 
-                drawnow();
-
-            end
-
-            
-%%
-
+            %Get joint trajectory to destination
             jointTrajectory = jtraj(r1.model.getpos, r1ResetPose, Steps); %work out the path it takes
-            %Move robot 1 out of the road
-            for i = 1:Steps
+            
+            MoveRobot(r1, gripper1, true, jointTrajectory, NaN );
+end
+
+
+  
+function AlterGripper(gripper, gripperClosed)
+    RotationY = 0.1;
+    if gripperClosed
+        RotationY = -0.1;
+    end
+
+    steps_ = 50; 
+
+    for i = 1:steps_ 
+                gripper.rightFinger.base = gripper.rightFinger.base.T * troty(RotationY/steps_);
+                gripper.leftFinger.base = gripper.leftFinger.base.T * troty(-RotationY/steps_);
+                gripper.rightFinger.animate(gripper.leftFinger.getpos);
+                gripper.leftFinger.animate(gripper.rightFinger.getpos);
+
+                drawnow();
+    end
+end
+function MoveRobot(robot, gripper, gripperClosed, jTraj, bottle)       
+        
+        FingerRotation = -0.1;
+        if gripperClosed
+            FingerRotation = 0.1;
+        end
+            
+
+        GripperOffset =  transl(0,0,-0.05);
+        BottleOffset =  trotx(-pi/2)  * transl(0,-0.08,-0.09);
+
+        if robot.plyFileNameStem(1) == 'L'
+            GripperOffset =  trotz(pi/2) * transl(0,0,0.05);
+            BottleOffset =   troty(pi/2)  * transl(-0.18,0,-0.1);
+        end
+
+        bottlePassed = isa(bottle, 'IR_Object');
+        
+        jtrajSize = size(jTraj);
+        for i = 1:jtrajSize
                 %adjust and animate the postion of the gripper
-                gripper1.gripperbase_.base = r1.model.fkineUTS(jointTrajectory(i,:)) * transl(0,0,-0.05);
-                gripper1.leftFinger.base = gripper1.gripperbase_.base.T * transl(0,0.1,0);
-                gripper1.rightFinger.base = gripper1.gripperbase_.base.T * transl(0,0.1,0);
+                gripper.gripperbase_.base = robot.model.fkineUTS(jTraj(i,:)) * GripperOffset;
+                gripper.leftFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(FingerRotation);
+                gripper.rightFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(-FingerRotation);
 
-                gripper1.gripperbase_.animate(gripper1.gripperbase_.getpos);
-                gripper1.leftFinger.animate(gripper1.leftFinger.getpos);
-                gripper1.rightFinger.animate(gripper1.rightFinger.getpos);
+                gripper.gripperbase_.animate(gripper.gripperbase_.getpos);
+                gripper.leftFinger.animate(gripper.leftFinger.getpos);
+                gripper.rightFinger.animate(gripper.rightFinger.getpos);
 
-                %animate the arm
-                animate(r1.model,jointTrajectory(i,:));
-                
-                drawnow();
-        
-            end
-        
-        
-        end
-        
-        %% collisiondetection
-        
-        function CheckRobotReach(self)
-            %% 
-            r = r2; %The robot to evaluate
-
-            checksize = true; %% change this to run the check for sizing
-            if checksize
-                display('starting check on range');
-                
-                R_qlim = r.model.qlim;
-                stepRads = deg2rad(40);
-                
-                pointCloudSize = prod(floor((R_qlim(1:6,2)-R_qlim(1:6,1))/stepRads + 1));
-                pointCloud = zeros(pointCloudSize,3);
-               
-                %Use an iterator that will be added to on each run
-                counter = 1;
-                tic
-               
-                for q1 = R_qlim(1,1):stepRads:R_qlim(1,2)
-                    for q2 = R_qlim(2,1):stepRads:R_qlim(2,2)
-                        for q3 = R_qlim(3,1):stepRads:R_qlim(3,2)
-                            for q4 = R_qlim(4,1):stepRads:R_qlim(4,2)
-                                for q5 = R_qlim(5,1):stepRads:R_qlim(5,2)
-                                    for q6 = R_qlim(6,1):stepRads:R_qlim(6,2)
-                                        %No q7 as final joint rotation not affecting final pose
-                                        q7 = 0;
-                                        NextPose = [q1,q2,q3,q4,q5,q6];
-                                        tr = r.model.fkineUTS(NextPose);
-                                        %If time permits, attempt using manual fkineUTS... 
-                
-                                        pointCloud(counter,:) = tr(1:3,4)';
-                                        counter = counter + 1;
-                                        if mod(counter/pointCloudSize * 100,1) == 0
-                                            display(['After ',num2str(toc),' seconds, completed ',num2str(counter/pointCloudSize * 100),'% of poses']);
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end
+                if bottlePassed
+                    bottle.model.base = robot.model.fkineUTS(jTraj(i,:)) * BottleOffset;
+                    animate(bottle.model,jTraj(i,:));
                 end
-            end
                 
-            %% Plotting the point cloud
-            if checksize
-                rangePlot = plot3(pointCloud(:,1),pointCloud(:,2),pointCloud(:,3),'r.');
-                
-                % convex hull and volume
-                [convexHull, volume] = convhull(pointCloud, 'Simplify', true);
-                convexHullPlot = trisurf(convexHull,pointCloud(:,1),pointCloud(:,2),pointCloud(:,3),'FaceColor', 'cyan');
-                fprintf('- \nVolume: \n%gm^3\n-\n', volume);
+                %animate the arm
+                animate(robot.model,jTraj(i,:));
                 
                 drawnow();
-                
-                % XYZ Max ranges
-                Xmax = max(pointCloud(:,1)) - min(pointCloud(:,1));
-                Ymax = max(pointCloud(:,2)) - min(pointCloud(:,2));
-                Zmax = max(pointCloud(:,3)) - min(pointCloud(:,3));
-                fprintf('- \nMax Range in X plane: %gm\nMax Range in Y plane: %gm\nMax Range in Z plane: %gm\n-\n', Xmax, Ymax, Zmax);
-                
-                % max radius calculations
-                Xrad = (abs((min(pointCloud(:,1))) + abs(max(pointCloud(:,1))))/2);
-                Yrad = (abs((min(pointCloud(:,2))) + abs(max(pointCloud(:,2))))/2);
-                Zrad = (abs((min(pointCloud(:,3))) + abs(max(pointCloud(:,3))))/2);
-                fprintf('- \nRadius in X plane: %gm\nRadius in Y plane: %gm\nRadius in Z plane: %gm\n-\n', Xrad, Yrad, Zrad);
-                
-                input('click enter to clear reaching plot')
-                
-                delete(rangePlot);
-                delete(convexHullPlot);
-            end
+        
         end
+end
+
+        

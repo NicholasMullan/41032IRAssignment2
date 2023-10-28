@@ -13,7 +13,7 @@ classdef IR_Object < RobotBaseClass
     methods 
         function self = IR_Object(type, name, pose)
         hold on;
-        self.Name = name;
+        self.name = name;
         self.BasePose = pose;
         self.homeQ = pose;
         self.Type = type;
@@ -48,7 +48,7 @@ classdef IR_Object < RobotBaseClass
             % Create the Robot2 model mounted on a linear rail
             link(1) = Link('alpha',0,'a',0,'d',0,'offset',0);
             
-            self.model = SerialLink(link,'name',self.Name);
+            self.model = SerialLink(link,'name',self.name);
         end
 
 

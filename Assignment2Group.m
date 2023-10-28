@@ -131,7 +131,7 @@ classdef Assignment2Group
         r2 = LinearLite6();
         %r2.model.base = r2.model.base * SE3(0,BarTableheight + OffsetTable,1.5);
         r2.model.base = r2.model.base *  SE3(-1.15,BarTableheight + OffsetTable,0);
-        
+       
         r2ResetPose = [0,     -pi/2,     0,     0,     0,     0,    0];
         r2.model.animate(r2.model.getpos);
 
