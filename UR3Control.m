@@ -1,4 +1,5 @@
 function UR3Control()
+    r1 = UR3();
     r1.model.teach;
     ControlGui = UR3GUI();
     while(1)

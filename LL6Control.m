@@ -1,4 +1,5 @@
 function LL6Control()
+    r2 = LinearLite6();
     r2.model.teach;
     ControlGui = LinearLite6GUI();
     while(1)
