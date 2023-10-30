@@ -1,5 +1,5 @@
 function UR3Control()
-    UR3.model.teach;
+    UR3.model.teach
     ControlGui = UR3GUI();
     while(1)
         pause(0.001);
