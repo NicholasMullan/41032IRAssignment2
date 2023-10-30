@@ -1,9 +1,9 @@
 function LL6Control()
-    LinearLite6.model.teach;
+    r2.model.teach;
     ControlGui = LinearLite6GUI();
     while(1)
         pause(0.001);
-        ControlGui.ControlGuiUpdate(LinearLite6);
+        ControlGui.ControlGuiUpdate(r2);
         if ControlGui.Exit == true
             fprintf('\nExited Control Mode')
             delete(ControlGui);
