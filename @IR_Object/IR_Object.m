@@ -4,16 +4,21 @@ classdef IR_Object < RobotBaseClass
 
     properties(Access = public)
         plyFileNameStem = '';
-
+        plyData
         BasePose %Hold the value of the base pose
         Name
         Type
+
+        h;
+        vertexColours;
+        InitialVertexColours; 
     end
 
     methods 
         function self = IR_Object(type, name, pose)
         hold on;
         self.name = name;
+        self.model.name = name;
         self.BasePose = pose;
         self.homeQ = pose;
         self.Type = type;
@@ -23,10 +28,13 @@ classdef IR_Object < RobotBaseClass
 
         self.model.base = self.model.base.T;
         
+
         self.PlotAndColourRobot();
 
+        self.InitialVertexColours = self.vertexColours;
+
         %  % Load vertices and faces from the PLY file
-        % [faceData, vertexData] = plyread(self.Type, 'tri')
+        % plyData = plyread(self.Type, 'tri')
         % link1 = Link('alpha',0,'a',0,'d',0,'offset',0);
         % 
         % self.model = SerialLink(link1,'name',name);
@@ -79,17 +87,17 @@ classdef IR_Object < RobotBaseClass
                 self.model.points{linkIndex+1} = vertexData;
             end
 
-            h = self.InitiliseRobotPlot();
-            if 1 < length(h)
+            self.h = self.InitiliseRobotPlot();
+            if 1 < length(self.h)
                 self.MultirobotWarningMessage();
-                h = h{1};
+                self.h = self.h{1};
             end
 
             % Try to correctly colour the arm (if colours are in ply file data)
             for linkIndex = 0:self.model.n
-                vertexColours = [0.5,0.5,0.5]; % Default if no colours in plyData
+                self.vertexColours = [0.5,0.5,0.5]; % Default if no colours in plyData
                 try 
-                     vertexColours = [plyData{linkIndex+1}.vertex.red ...
+                     self.vertexColours = [plyData{linkIndex+1}.vertex.red ...
                                      , plyData{linkIndex+1}.vertex.green ...
                                      , plyData{linkIndex+1}.vertex.blue]/255;
 
@@ -97,7 +105,7 @@ classdef IR_Object < RobotBaseClass
                     disp(ME_1);
                     disp('No vertex colours in plyData');
                     try 
-                         vertexColours = [plyData{linkIndex+1}.face.red ...
+                         self.vertexColours = [plyData{linkIndex+1}.face.red ...
                                      , plyData{linkIndex+1}.face.green ...
                                      , plyData{linkIndex+1}.face.blue]/255;
                     catch ME_1
@@ -106,8 +114,8 @@ classdef IR_Object < RobotBaseClass
                     end
                 end
 
-                h.link(linkIndex+1).Children.FaceVertexCData = vertexColours;
-                h.link(linkIndex+1).Children.FaceColor = 'interp';
+                self.h.link(linkIndex+1).Children.FaceVertexCData = self.vertexColours;
+                self.h.link(linkIndex+1).Children.FaceColor = 'interp';
             end
             drawnow();
         end
