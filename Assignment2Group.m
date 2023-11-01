@@ -43,12 +43,19 @@ classdef Assignment2Group < handle
         StateMachine; %For higher level tasks to be completed
         SubStateMachine; %For lower level tasks to be completed. Clear at end of function
 
+        EStopPressed; 
+        EStopReleased; 
+
+
     end
     methods
     
         function self = Assignment2Group()
                 %% The main function for this setup
                 hold on
+
+                EStopPressed = false;
+                EStopReleased = false; 
 
                 %Reset our state machines
                 self.SubStateMachine = 0;
@@ -59,7 +66,8 @@ classdef Assignment2Group < handle
                 self.SetupRobots();
                 self.PlaceBottles();
 
-                gui = GUI();
+                %gui = GUI()
+                %gui.Assignment = this; 
 
                 display("Press to order a drink.");
             end
@@ -261,7 +269,13 @@ classdef Assignment2Group < handle
                 %self.StateMachine = 2;
 
                 while (self.StateMachine <= 3)
+                if EStopPressed
+                        return;
+                        %Ideally this one is wait until EStopReleased
+                        %Then set EEStopPressed = false
 
+                        %pause(2); %To stop the system crashing
+                end
                     switch(self.StateMachine)
                         case 0
                             self.Robot1GetGlass();
@@ -318,7 +332,9 @@ classdef Assignment2Group < handle
             EmptyCan = self.EmptyCan;
 
             while (self.SubStateMachine <= 2)
-
+                 if EStopPressed
+                        return;
+                end
                     switch (self.SubStateMachine)
                         case 0
                             disp("Step 1.1: Moving robot 1 to cup")
@@ -390,7 +406,9 @@ classdef Assignment2Group < handle
                 
                 %3 sub missions in this function
                 while (self.SubStateMachine < 3)
-
+                    if EStopPressed
+                        return;
+                    end
                     switch (self.SubStateMachine)
                         case 0
                             disp("Step 2.1: Moving robot 2 to bottle")
@@ -463,7 +481,9 @@ classdef Assignment2Group < handle
             ReturnPos = r2.model.getpos;
 
             while (self.SubStateMachine <= 4)
-
+                if EStopPressed
+                    return;
+                end
                 switch (self.SubStateMachine)
                     case 0
                         disp("Step 3.1: Lifting full can")  
@@ -541,7 +561,9 @@ classdef Assignment2Group < handle
             EmptyCan = self.EmptyCan;
 
             while (self.SubStateMachine <= 2)
-
+                    if EStopPressed
+                        return;
+                    end
                     switch (self.SubStateMachine)
                         case 0
                             disp("Step 4.1: Moving robot 1 to cup")
@@ -629,6 +651,10 @@ function MoveRobot(robot, gripper, gripperClosed, jTraj, bottle)
         
         jtrajSize = size(jTraj);
         for i = 1:jtrajSize
+                if EStopPressed
+                    return;
+                end
+
                 %adjust and animate the postion of the gripper
                 gripper.gripperbase_.base = robot.model.fkineUTS(jTraj(i,:)) * GripperOffset;
                 gripper.leftFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(FingerRotation);
@@ -682,6 +708,10 @@ function MoveRobotExchangeLiquid(robot, gripper, gripperClosed, jTraj, FullBottl
 
         jtrajSize = size(jTraj);
         for i = 1:jtrajSize
+                if EStopPressed
+                    return;
+                end
+
                 %adjust and animate the postion of the gripper
                 gripper.gripperbase_.base = robot.model.fkineUTS(jTraj(i,:)) * GripperOffset;
                 gripper.leftFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(FingerRotation);
@@ -725,19 +755,5 @@ function MoveRobotExchangeLiquid(robot, gripper, gripperClosed, jTraj, FullBottl
             EmptyBottle.vertexColours(i,:) = colour;
         end
         drawnow();
-end
-
-function UR3Control()
-    r1.model.teach;
-    ControlGui = UR3GUI();
-    while(1)
-        pause(0.001);
-        ControlGui.ControlGuiUpdate(r1);
-        if ControlGui.Exit == true
-            fprintf('\nExited Control Mode')
-            delete(ControlGui);
-            break;
-        end
-    end
 end
  
