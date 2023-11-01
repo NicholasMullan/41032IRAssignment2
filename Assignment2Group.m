@@ -4,9 +4,7 @@
 
 %INSTRUCTIONS!!!!!!!!
 %To intialise the system, type the below into terminal. 
-%       Assignment = Assignment2Group()
-%Give the scene a minute to load and then you can use the GUI (pending) or the below script to run
-%       Assignment.CollectOrderFromCustomer('Lemonade');
+% run(GUI())
 
 classdef Assignment2Group < handle  
     properties
@@ -45,8 +43,6 @@ classdef Assignment2Group < handle
 
         EStopPressed; 
         EStopReleased; 
-
-
     end
     methods
     
@@ -80,7 +76,7 @@ classdef Assignment2Group < handle
                 clear all; 
                 hold on
                 % close all; %Dont close all. Dock the figure for ease of use
-        display("ClearAndClose complete");
+                display("ClearAndClose complete");
         
             end
             
@@ -120,7 +116,7 @@ classdef Assignment2Group < handle
             cctvXYZ=[-rs+0.1,-rs,wh-0.5];
             %Placing CCTV
             PlaceObject('cctv.ply',cctvXYZ);
-        display("SetupEnvironment complete");
+            display("SetupEnvironment complete");
         
                     
             end
