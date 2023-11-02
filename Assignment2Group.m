@@ -41,8 +41,8 @@ classdef Assignment2Group < handle
         StateMachine; %For higher level tasks to be completed
         SubStateMachine; %For lower level tasks to be completed. Clear at end of function
 
-        EStopPressed; 
-        EStopReleased; 
+        eStopPressed; 
+        eStopReleased; 
     end
     methods
     
@@ -50,8 +50,8 @@ classdef Assignment2Group < handle
                 %% The main function for this setup
                 hold on
 
-                EStopPressed = false;
-                EStopReleased = false; 
+                eStopPressed = false;
+                eStopReleased = false; 
 
                 %Reset our state machines
                 self.SubStateMachine = 0;
@@ -265,17 +265,17 @@ classdef Assignment2Group < handle
                 %self.StateMachine = 2;
 
                 while (self.StateMachine <= 3)
-               if EStopPressed
-                % E-stop is pressed, exit the loop or take appropriate action
-                break;
-            elseif self.EStopReleased
-                % E-stop is released
-                if ~self.continuePressed
-                    % Continue button is pressed, take appropriate action
-                    break;
-                end
-                % Add any other actions to be taken when E-stop is released
-            end
+                   if self.eStopPressed
+                        % E-stop is pressed, exit the loop or take appropriate action
+                        break;
+                   elseif self.eStopReleased
+                    % E-stop is released
+                        if ~self.continuePressed
+                            % Continue button is pressed, take appropriate action
+                            break;
+                        end
+                    % Add any other actions to be taken when E-stop is released
+                   end
 
                     switch(self.StateMachine)
                         case 0
@@ -333,9 +333,17 @@ classdef Assignment2Group < handle
             EmptyCan = self.EmptyCan;
 
             while (self.SubStateMachine <= 2)
-                 if EStopPressed
-                        return;
+                  if self.eStopPressed
+                % E-stop is pressed, exit the loop or take appropriate action
+                break;
+            elseif self.eStopReleased
+                % E-stop is released
+                if ~self.continuePressed
+                    % Continue button is pressed, take appropriate action
+                    break;
                 end
+                % Add any other actions to be taken when E-stop is released
+               end
                     switch (self.SubStateMachine)
                         case 0
                             disp("Step 1.1: Moving robot 1 to cup")
@@ -407,9 +415,17 @@ classdef Assignment2Group < handle
                 
                 %3 sub missions in this function
                 while (self.SubStateMachine < 3)
-                    if EStopPressed
-                        return;
-                    end
+                    if self.eStopPressed
+                % E-stop is pressed, exit the loop or take appropriate action
+                break;
+            elseif self.eStopReleased
+                % E-stop is released
+                if ~self.continuePressed
+                    % Continue button is pressed, take appropriate action
+                    break;
+                end
+                % Add any other actions to be taken when E-stop is released
+               end
                     switch (self.SubStateMachine)
                         case 0
                             disp("Step 2.1: Moving robot 2 to bottle")
@@ -482,9 +498,17 @@ classdef Assignment2Group < handle
             ReturnPos = r2.model.getpos;
 
             while (self.SubStateMachine <= 4)
-                if EStopPressed
-                    return;
+               if self.eStopPressed
+                % E-stop is pressed, exit the loop or take appropriate action
+                break;
+            elseif self.eStopReleased
+                % E-stop is released
+                if ~self.continuePressed
+                    % Continue button is pressed, take appropriate action
+                    break;
                 end
+                % Add any other actions to be taken when E-stop is released
+               end
                 switch (self.SubStateMachine)
                     case 0
                         disp("Step 3.1: Lifting full can")  
@@ -562,9 +586,17 @@ classdef Assignment2Group < handle
             EmptyCan = self.EmptyCan;
 
             while (self.SubStateMachine <= 2)
-                    if EStopPressed
-                        return;
-                    end
+                    if self.eStopPressed
+                % E-stop is pressed, exit the loop or take appropriate action
+                break;
+            elseif self.eStopReleased
+                % E-stop is released
+                if ~self.continuePressed
+                    % Continue button is pressed, take appropriate action
+                    break;
+                end
+                % Add any other actions to be taken when E-stop is released
+               end
                     switch (self.SubStateMachine)
                         case 0
                             disp("Step 4.1: Moving robot 1 to cup")
@@ -652,9 +684,18 @@ function MoveRobot(robot, gripper, gripperClosed, jTraj, bottle)
         
         jtrajSize = size(jTraj);
         for i = 1:jtrajSize
-                if EStopPressed
-                    return;
+            %PATRICK BROKE THIS. HE NEEDS A HERO
+                 if Gui.GUIestop
+                % E-stop is pressed, exit the loop or take appropriate action
+                break;
+            elseif self.EStopReleased
+                % E-stop is released
+                if ~self.continuePressed
+                    % Continue button is pressed, take appropriate action
+                    break;
                 end
+                % Add any other actions to be taken when E-stop is released
+                 end
 
                 %adjust and animate the postion of the gripper
                 gripper.gripperbase_.base = robot.model.fkineUTS(jTraj(i,:)) * GripperOffset;
@@ -709,9 +750,19 @@ function MoveRobotExchangeLiquid(robot, gripper, gripperClosed, jTraj, FullBottl
 
         jtrajSize = size(jTraj);
         for i = 1:jtrajSize
-                if EStopPressed
-                    return;
-                end
+            %patrick has been here
+            %       if EStopPressed
+            %     % E-stop is pressed, exit the loop or take appropriate action
+            %     break;
+            % elseif self.EStopReleased
+            %     % E-stop is released
+            %     if ~self.continuePressed
+            %         % Continue button is pressed, take appropriate action
+            %         break;
+            %     end
+            %     % Add any other actions to be taken when E-stop is released
+            %      end
+
 
                 %adjust and animate the postion of the gripper
                 gripper.gripperbase_.base = robot.model.fkineUTS(jTraj(i,:)) * GripperOffset;

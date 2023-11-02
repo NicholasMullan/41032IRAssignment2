@@ -23,7 +23,7 @@ startJointSend.TimeFromStart = rosduration(0);
 endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
 %nextJointState_123456 = currentJointState_123456 + [0,pi/4,pi/2,pi/4,pi/2,0];                                  
 %nextJointState_123456 = currentJointState_123456 + [pi,0,0,0,0,0]; %[0,-(2*pi)/3,-pi/2,-2*pi/3,-pi/2,0];
-nextJointState_123456 = currentJointState_123456 + [-pi,0,0,0,0,0]
+%nextJointState_123456 = currentJointState_123456 + [-pi,0,0,0,0,0]
 endJointSend.Positions = nextJointState_123456;
 endJointSend.TimeFromStart = rosduration(durationSeconds);
 
