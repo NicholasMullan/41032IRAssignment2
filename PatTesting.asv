@@ -1,8 +1,6 @@
 
-pose111111 = SE3(0,0,0);
-item = IR_Object('CanClear.ply', 'GenericName', pose111111)
-
-hold on
+pose = SE3(0,0,0);
+item = IR_Object("cctv.ply", "GenericName", pose);
 %% 
 %% 
 
