@@ -265,13 +265,18 @@ classdef Assignment2Group < handle
                 %self.StateMachine = 2;
 
                 while (self.StateMachine <= 3)
-                if EStopPressed
-                        return;
-                        %Ideally this one is wait until EStopReleased
-                        %Then set EEStopPressed = false
-
-                        %pause(2); %To stop the system crashing
+               if EStopPressed
+                % E-stop is pressed, exit the loop or take appropriate action
+                break;
+            elseif self.EStopReleased
+                % E-stop is released
+                if ~self.continuePressed
+                    % Continue button is pressed, take appropriate action
+                    break;
                 end
+                % Add any other actions to be taken when E-stop is released
+            end
+
                     switch(self.StateMachine)
                         case 0
                             self.Robot1GetGlass();
