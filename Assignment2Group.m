@@ -43,6 +43,9 @@ classdef Assignment2Group < handle
 
         eStopPressed; 
         eStopReleased; 
+
+        PoseGuess; 
+       
     end
     methods
     
@@ -50,8 +53,8 @@ classdef Assignment2Group < handle
                 %% The main function for this setup
                 hold on
 
-                eStopPressed = false;
-                eStopReleased = false; 
+                self.eStopPressed = false;
+                self.eStopReleased = false; 
 
                 %Reset our state machines
                 self.SubStateMachine = 0;
@@ -64,8 +67,8 @@ classdef Assignment2Group < handle
 
                 %gui = GUI()
                 %gui.Assignment = this; 
-
-                display("Press to order a drink.");
+                display("Setup Complete.");
+                display("Please select your drink.");
             end
             
             % General set up of environment
@@ -76,14 +79,16 @@ classdef Assignment2Group < handle
                 clear all; 
                 hold on
                 % close all; %Dont close all. Dock the figure for ease of use
-                display("ClearAndClose complete");
+                display("Clear And Close complete. Please wait for set up process");
         
             end
             
             function SetupEnvironment(self)
             %% Setting up enviroment 
             hold on
-            
+
+            display("Setting up Environment");
+
             rs= 2; %Roomsize
             wh= 2; % Wall height
             wb=0; %wall base
@@ -116,7 +121,6 @@ classdef Assignment2Group < handle
             cctvXYZ=[-rs+0.1,-rs,wh-0.5];
             %Placing CCTV
             PlaceObject('cctv.ply',cctvXYZ);
-            display("SetupEnvironment complete");
         
                     
             end
@@ -126,7 +130,7 @@ classdef Assignment2Group < handle
             %Robot 1 is the UR5
             hold on
             
-           
+           display("Setting up Robots");
             
             r1 = UR3();
             r1.model.base = r1.model.base * SE3(-0.5,-0.2,self.BarTableheight + self.OffsetTable);
@@ -177,13 +181,14 @@ classdef Assignment2Group < handle
             self.gripper1 = gripper1;
             self.gripper2 = gripper2; 
             
-        display("SetupRobots complete");
         
             end
             
             function PlaceBottles(self)
                 %% Use this to place each of the bottles in a position
                 hold on
+                display("Placing bottles");
+
         
                 StartingX = -1.5;
             
@@ -219,7 +224,6 @@ classdef Assignment2Group < handle
                 self.EmptyCan = IR_Object('CanClear.ply','EmptyCan', self.FinalObjectLocationsArray(1,:)); 
             
             
-            display("PlaceBottles complete");
         
             end
 
@@ -230,7 +234,7 @@ classdef Assignment2Group < handle
                 hold on;
                 Steps = 50;
                 %reduce the work by adding a guess
-                PoseGuess = [-0.4145, 1.0969, -0.5204, -1.6201, -1.3009, 1.1764, 0.6240];
+                self.PoseGuess = [-0.4145, 1.0969, -0.5204, -1.6201, -1.3009, 1.1764, 0.6240];
     
                 FingerRotationOpen = 0.1;
                 FingerRotationClosed = -0.1;
@@ -267,13 +271,9 @@ classdef Assignment2Group < handle
                 while (self.StateMachine <= 3)
                    if self.eStopPressed
                         % E-stop is pressed, exit the loop or take appropriate action
-                        break;
-                   elseif self.eStopReleased
-                    % E-stop is released
-                        if ~self.continuePressed
-                            % Continue button is pressed, take appropriate action
-                            break;
-                        end
+                        disp('EStop pressed. Robot function paused and awaiting EStop release and continue to be pressed.');
+                        pause(3);
+                        continue;
                     % Add any other actions to be taken when E-stop is released
                    end
 
@@ -288,11 +288,12 @@ classdef Assignment2Group < handle
                             self.Robot1ReturnCup();
 
                     end
-                    self.StateMachine = self.StateMachine+1;
 
                 end
 
                 self.StateMachine = 0;
+                self.SubStateMachine = 0;
+
                 display("Enjoy your drink");
 
                 pause(5);
@@ -333,70 +334,63 @@ classdef Assignment2Group < handle
             EmptyCan = self.EmptyCan;
 
             while (self.SubStateMachine <= 2)
-                  if self.eStopPressed
-                % E-stop is pressed, exit the loop or take appropriate action
-                break;
-            elseif self.eStopReleased
-                % E-stop is released
-                if ~self.continuePressed
-                    % Continue button is pressed, take appropriate action
-                    break;
-                end
-                % Add any other actions to be taken when E-stop is released
-               end
+                    if self.eStopPressed
+                                % E-stop is pressed, exit the loop or take appropriate action
+                                if self.SubStateMachine > 0;
+                                    self.SubStateMachine =  self.SubStateMachine - 1;
+                                end
+                                return;
+                    end
                     switch (self.SubStateMachine)
                         case 0
                             disp("Step 1.1: Moving robot 1 to cup")
                             
                             %Move toward final position
-                            PoseGuess = [deg2rad(20),   deg2rad(-110),   deg2rad(-110),   deg2rad(-145),   deg2rad(-80),   deg2rad(-5)];
+                            self.PoseGuess = [deg2rad(20),   deg2rad(-110),   deg2rad(-110),   deg2rad(-145),   deg2rad(-80),   deg2rad(-5)];
                             StepPose = EmptyCan.model.base.T * transl(-0.15,0,0.15) * trotx(pi/2) * troty(pi/2);
-                            Robot1Final = r1.model.ikcon(StepPose,PoseGuess);
+                            Robot1Final = r1.model.ikcon(StepPose,self.PoseGuess);
                             jointTrajectory = jtraj(r1.model.getpos, Robot1Final, Steps); %work out the path it takes
                             
                             %Creep to final position
                             StepPose = EmptyCan.model.base.T  * transl(-0.08,0,0.08) * trotx(pi/2) * troty(pi/2);
-                            Robot1Final = r1.model.ikcon(StepPose,PoseGuess);
+                            Robot1Final = r1.model.ikcon(StepPose,self.PoseGuess);
                             jointTrajectory2 = jtraj(jointTrajectory(Steps,:), Robot1Final, Steps/2); %Creep trajectorys
             
                             jointTrajectory = [jointTrajectory; jointTrajectory2 ];
 
-                            MoveRobot(r1, gripper1, false, jointTrajectory, NaN);
+                            self.MoveRobot(r1, gripper1, false, jointTrajectory, NaN);
                         case 1
                             % Close gripper
                             disp("Step 1.2: Robot arrived at cup, closing gripper")
-                            AlterGripper(gripper1, true); %false to open gripper, true to close
+                            self.AlterGripper(gripper1, true); %false to open gripper, true to close
                         
                         case 2
                             disp("Step 1.3: Robot carrying cup to pouring position")           
                             
                             %Lift the cup from its initial pose
-                            PoseGuess = [deg2rad(20),   deg2rad(-110),   deg2rad(-110),   deg2rad(-145),   deg2rad(-80),   deg2rad(-5)];
+                            self.PoseGuess = [deg2rad(20),   deg2rad(-110),   deg2rad(-110),   deg2rad(-145),   deg2rad(-80),   deg2rad(-5)];
                             StepPose = EmptyCan.model.base.T * transl(-0.15,0,0.15) * trotx(pi/2) * troty(pi/2);
-                            Robot1Final = r1.model.ikcon(StepPose,PoseGuess);
+                            Robot1Final = r1.model.ikcon(StepPose,self.PoseGuess);
                             jointTrajectory = jtraj(r1.model.getpos, Robot1Final, Steps/2); %work out the path it takes
 
                             %Move to intermediate pose
-                            PoseGuess = [-2.5993,   -2.2692,   -1.4595, -2.5544,   -1.5340,   -0.0000];
+                            self.PoseGuess = [-2.5993,   -2.2692,   -1.4595, -2.5544,   -1.5340,   -0.0000];
                             Bottle_Pose = SE3(self.IntermediateObjectLocations1).T * trotx(pi/2) * transl(0,0.15,0) * troty(-pi/2) ;
                
-                            Robot1Intermediate = r1.model.ikcon(Bottle_Pose,PoseGuess);
+                            Robot1Intermediate = r1.model.ikcon(Bottle_Pose,self.PoseGuess);
                             jointTrajectory2 = jtraj(jointTrajectory(Steps/2,:), Robot1Intermediate, Steps); %work out the path it takes
             
-                            %Creep to intermediate pose
-                            % PoseGuess = [-2.5993,   -2.2692,   -1.4595, -2.5544,   -1.5340,   -0.0000];
-                            % Bottle_Pose = SE3(self.IntermediateObjectLocations1).T * trotx(pi/2) * transl(0,0.08,0) * troty(-pi/2) ;
-                            % Robot1Intermediate = r1.model.ikcon(Bottle_Pose,PoseGuess);
-                            % jointTrajectory3 = jtraj(jointTrajectory2(Steps,:), Robot1Intermediate, Steps/2); %work out the path it takes
-                            % 
                             jointTrajectory = [jointTrajectory; jointTrajectory2]; %; jointTrajectory3];
-                            MoveRobot(r1, gripper1, true, jointTrajectory, EmptyCan);        
+                            self.MoveRobot(r1, gripper1, true, jointTrajectory, EmptyCan);        
+                    end
+                    if self.eStopPressed
+                        % E-stop is pressed, exit the loop or take appropriate action
+                        return;
                     end
                     self.SubStateMachine = self.SubStateMachine+1;
                 end
                 self.SubStateMachine = 0;
-
-
+                self.StateMachine = self.StateMachine+1;
             end
 
             function Robot2CollectBottle(self)
@@ -416,63 +410,63 @@ classdef Assignment2Group < handle
                 %3 sub missions in this function
                 while (self.SubStateMachine < 3)
                     if self.eStopPressed
-                % E-stop is pressed, exit the loop or take appropriate action
-                break;
-            elseif self.eStopReleased
-                % E-stop is released
-                if ~self.continuePressed
-                    % Continue button is pressed, take appropriate action
-                    break;
-                end
-                % Add any other actions to be taken when E-stop is released
-               end
+                                % E-stop is pressed, exit the loop or take appropriate action
+                                if self.SubStateMachine > 0;
+                                    self.SubStateMachine =  self.SubStateMachine - 1;
+                                end
+                                return;
+                    end
                     switch (self.SubStateMachine)
                         case 0
                             disp("Step 2.1: Moving robot 2 to bottle")
     
                             % Use Robot 2 to move bottle from initial pose to intermediate pose
                             % Robot close to position
-                            PoseGuess = [-0.4145, 1.0969, -0.5204, -1.6201, -1.3009, 1.1764, 0.6240];
+                            self.PoseGuess = [-0.4145, 1.0969, -0.5204, -1.6201, -1.3009, 1.1764, 0.6240];
                             Bottle_Pose = Bottle_.model.base.T * troty(-pi/2) * transl(0.1,0,-.24);
-                            robot2Bottle = r2.model.ikcon(Bottle_Pose,PoseGuess);
+                            robot2Bottle = r2.model.ikcon(Bottle_Pose,self.PoseGuess);
                             jointTrajectory = jtraj(r2.model.getpos, robot2Bottle, Steps); %work out the path it takes
                 
                             % creep speed to get in close
-                            PoseGuess = [ -0.4049    0.8781   -0.6030   -1.4791   -1.1850    0.9801    0.6300];
+                            self.PoseGuess = [ -0.4049    0.8781   -0.6030   -1.4791   -1.1850    0.9801    0.6300];
                             Bottle_Pose = Bottle_.model.base.T * troty(-pi/2) * transl(0.1,0,-0.18);
-                            robot2Bottle = r2.model.ikcon(Bottle_Pose,PoseGuess);
+                            robot2Bottle = r2.model.ikcon(Bottle_Pose,self.PoseGuess);
                             creepJointTrajectory = jtraj(jointTrajectory(50,:), robot2Bottle, Steps/2); %work out the path it takes
                 
                             jointTrajectory = [jointTrajectory; creepJointTrajectory ];
             
-                            MoveRobot(r2, gripper2, false, jointTrajectory, NaN);
+                            self.MoveRobot(r2, gripper2, false, jointTrajectory, NaN);
                         case 1
                             % Close gripper
                             disp("Step 2.2: Robot arrived at bottle, closing gripper")
-                            AlterGripper(gripper2, true); %false to open gripper, true to close
+                            self.AlterGripper(gripper2, true); %false to open gripper, true to close
                         case 2
                             disp("Step 2.3: Bottle picked up, moving to intermediate position")
                             %creep Movement up after picking bottle
                             Bottle_Pose = Bottle_.model.base.T * troty(-pi/2) * transl(0.2,0,-.3);
-                            robot2Bottle = r2.model.ikcon(Bottle_Pose,PoseGuess);
+                            robot2Bottle = r2.model.ikcon(Bottle_Pose,self.PoseGuess);
                             jointTrajectory = jtraj(r2.model.getpos, robot2Bottle, Steps/2); %work out the path it takes
                 
                              %Movement to near intermediate position
-                            PoseGuess = [0.0420    1.3929   -1.4104   -0.9893    0.2391    0.8434    1.7315];
+                            self.PoseGuess = [0.0420    1.3929   -1.4104   -0.9893    0.2391    0.8434    1.7315];
                             StepPose = SE3(self.IntermediateObjectLocations2).T * troty(-pi/2) * trotx(pi/2) * transl(0.24,0,-0.25);
-                            Robot2Intermediate = r2.model.ikcon(StepPose,PoseGuess);
+                            Robot2Intermediate = r2.model.ikcon(StepPose,self.PoseGuess);
                             jointTrajectory2 = jtraj(jointTrajectory(25,:), Robot2Intermediate, Steps); %work out the path it takes
                 
                             jointTrajectory = [jointTrajectory; jointTrajectory2]; % jointTrajectory3];
                             jtrajSize = size(jointTrajectory);
                 
-                            MoveRobot(r2, gripper2, true, jointTrajectory,Bottle_);
+                            self.MoveRobot(r2, gripper2, true, jointTrajectory,Bottle_);
+                    end
+                    if self.eStopPressed
+                        % E-stop is pressed, exit the loop or take appropriate action
+                        return;
                     end
                     self.SubStateMachine = self.SubStateMachine+1;
 
                 end
                 self.SubStateMachine = 0;
-               
+               self.StateMachine = self.StateMachine+1;
             end
            
             function Robot2PourBottle(self)
@@ -499,76 +493,72 @@ classdef Assignment2Group < handle
 
             while (self.SubStateMachine <= 4)
                if self.eStopPressed
-                % E-stop is pressed, exit the loop or take appropriate action
-                break;
-            elseif self.eStopReleased
-                % E-stop is released
-                if ~self.continuePressed
-                    % Continue button is pressed, take appropriate action
-                    break;
-                end
-                % Add any other actions to be taken when E-stop is released
-               end
+                                % E-stop is pressed, exit the loop or take appropriate action
+                                if self.SubStateMachine > 0;
+                                    self.SubStateMachine =  self.SubStateMachine - 1;
+                                end
+                                return;
+                    end
                 switch (self.SubStateMachine)
                     case 0
                         disp("Step 3.1: Lifting full can")  
                         %creep Movement up after picking bottle
-                        PoseGuess = [-0.1800,    1.5826,   -1.2519,   -0.4016,   -0.0236,    0.0826,         0];
-                        jointTrajectory = jtraj(r2.model.getpos, PoseGuess, Steps); %work out the path it takes
+                        self.PoseGuess = [-0.1800,    1.5826,   -1.2519,   -0.4016,   -0.0236,    0.0826,         0];
+                        jointTrajectory = jtraj(r2.model.getpos, self.PoseGuess, Steps); %work out the path it takes
 
-                        PoseGuess = [-0.1800,    1.6299,   -1.2519,   -0.4016,   -0.0236,    0.0826,         -0.7322];
-                        jointTrajectory2 = jtraj(jointTrajectory(Steps,:), PoseGuess, Steps/2); %work out the path it takes
+                        self.PoseGuess = [-0.1800,    1.6299,   -1.2519,   -0.4016,   -0.0236,    0.0826,         -0.7322];
+                        jointTrajectory2 = jtraj(jointTrajectory(Steps,:), self.PoseGuess, Steps/2); %work out the path it takes
                             
                         jointTrajectory = [jointTrajectory; jointTrajectory2];
 
-                        MoveRobotExchangeLiquid(r2, gripper2, true, jointTrajectory, Bottle_, EmptyCan);
+                        self.MoveRobotExchangeLiquid(r2, gripper2, true, jointTrajectory, Bottle_, EmptyCan);
                     case 1
                         % 
                         disp("Step 3.2: Fix pose of Robot 2")
                         
                         jointTrajectory = jtraj(r2.model.getpos, ReturnPos, Steps); %work out the path it takes
-                        MoveRobot(r2, gripper2, true, jointTrajectory, Bottle_);
+                        self.MoveRobot(r2, gripper2, true, jointTrajectory, Bottle_);
 
                     case 2
                         disp("Step 3.3:  Move bottle back to position")
 
                         % Use Robot 2 to move bottle from current pose to initial pose
 
-                        PoseGuess = [-0.4145, 1.0969, -0.5204, -1.6201, -1.3009, 1.1764, 0.6240];
+                        self.PoseGuess = [-0.4145, 1.0969, -0.5204, -1.6201, -1.3009, 1.1764, 0.6240];
                         Bottle_Pose = SE3(Bottle_.homeQ).T * troty(-pi/2) * transl(0.2,0,-.24);;
-                        robot2Bottle = r2.model.ikcon(Bottle_Pose,PoseGuess);
+                        robot2Bottle = r2.model.ikcon(Bottle_Pose,self.PoseGuess);
                         jointTrajectory = jtraj(r2.model.getpos, robot2Bottle, Steps); %work out the path it takes
 
                         % creep speed to get in close
-                        PoseGuess = [ -0.4049    0.8781   -0.6030   -1.4791   -1.1850    0.9801    0.6300];
+                        self.PoseGuess = [ -0.4049    0.8781   -0.6030   -1.4791   -1.1850    0.9801    0.6300];
                         Bottle_Pose = SE3(Bottle_.homeQ).T * troty(-pi/2) * transl(0.1,0,-0.18);
-                        robot2Bottle = r2.model.ikcon(Bottle_Pose,PoseGuess);
+                        robot2Bottle = r2.model.ikcon(Bottle_Pose,self.PoseGuess);
                         creepJointTrajectory = jtraj(jointTrajectory(50,:), robot2Bottle, Steps/2); %work out the path it takes
 
                         jointTrajectory = [jointTrajectory; creepJointTrajectory ];
-                        MoveRobot(r2, gripper2, true, jointTrajectory, Bottle_);
+                        self.MoveRobot(r2, gripper2, true, jointTrajectory, Bottle_);
                     case 3
                         disp("Step 3.4:  Opening gripper to release bottle")
-                        AlterGripper(gripper2, false); %false to open gripper, true to close
+                        self.AlterGripper(gripper2, false); %false to open gripper, true to close
                     case 4
                         disp("Step 3.5: Return robot 2 to base pose")
 
                         %Creep away from bottle
-                        PoseGuess = [-0.4145, 1.0969, -0.5204, -1.6201, -1.3009, 1.1764, 0.6240];
+                        self.PoseGuess = [-0.4145, 1.0969, -0.5204, -1.6201, -1.3009, 1.1764, 0.6240];
                         Bottle_Pose = SE3(Bottle_.homeQ).T * troty(-pi/2) * transl(0.2,0,-.24);;
-                        robot2Bottle = r2.model.ikcon(Bottle_Pose,PoseGuess);
+                        robot2Bottle = r2.model.ikcon(Bottle_Pose,self.PoseGuess);
                         jointTrajectory = jtraj(r2.model.getpos, robot2Bottle, Steps/2); %work out the path it takes
 
                         %Return to base
                         jointTrajectory2 = jtraj(jointTrajectory(Steps/2,:), self.r2ResetPose, Steps); %work out the path it takes
                         
                         jointTrajectory = [jointTrajectory; jointTrajectory2];
-                        MoveRobot(r2, gripper2, false, jointTrajectory, NaN);
+                        self.MoveRobot(r2, gripper2, false, jointTrajectory, NaN);
                 end
                 self.SubStateMachine = self.SubStateMachine+1;
             end
-
             self.SubStateMachine = 0;
+            self.StateMachine = self.StateMachine+1;
             end
 
             function Robot1ReturnCup(self)
@@ -586,226 +576,248 @@ classdef Assignment2Group < handle
             EmptyCan = self.EmptyCan;
 
             while (self.SubStateMachine <= 2)
-                    if self.eStopPressed
-                % E-stop is pressed, exit the loop or take appropriate action
-                break;
-            elseif self.eStopReleased
-                % E-stop is released
-                if ~self.continuePressed
-                    % Continue button is pressed, take appropriate action
-                    break;
-                end
-                % Add any other actions to be taken when E-stop is released
-               end
+                     if self.eStopPressed
+                                % E-stop is pressed, exit the loop or take appropriate action
+                                if self.SubStateMachine > 0;
+                                    self.SubStateMachine =  self.SubStateMachine - 1;
+                                end
+                                return;
+                    end
                     switch (self.SubStateMachine)
                         case 0
                             disp("Step 4.1: Moving robot 1 to cup")
                             
                             %Move toward final position
-                            PoseGuess = [deg2rad(20),   deg2rad(-110),   deg2rad(-110),   deg2rad(-145),   deg2rad(-80),   deg2rad(-5)];
+                            self.PoseGuess = [deg2rad(20),   deg2rad(-110),   deg2rad(-110),   deg2rad(-145),   deg2rad(-80),   deg2rad(-5)];
                             StepPose = SE3(EmptyCan.homeQ).T * transl(-0.15,0,0.15) * trotx(pi/2) * troty(pi/2);
-                            Robot1Final = r1.model.ikcon(StepPose,PoseGuess);
+                            Robot1Final = r1.model.ikcon(StepPose,self.PoseGuess);
                             jointTrajectory = jtraj(r1.model.getpos, Robot1Final, Steps); %work out the path it takes
                             
                             %Creep to final position
                             StepPose = SE3(EmptyCan.homeQ).T  * transl(-0.08,0,0.08) * trotx(pi/2) * troty(pi/2);
-                            Robot1Final = r1.model.ikcon(StepPose,PoseGuess);
+                            Robot1Final = r1.model.ikcon(StepPose,self.PoseGuess);
                             jointTrajectory2 = jtraj(jointTrajectory(Steps,:), Robot1Final, Steps/2); %Creep trajectorys
             
                             jointTrajectory = [jointTrajectory; jointTrajectory2 ];
 
-                            MoveRobot(r1, gripper1, true, jointTrajectory, EmptyCan);
+                            self.MoveRobot(r1, gripper1, true, jointTrajectory, EmptyCan);
+
+
                         case 1
                             % Open gripper
                             disp("Step 4.2:  Opening gripper to release bottle")
-                            AlterGripper(gripper1, false); %false to open gripper, true to close
+                            self.AlterGripper(gripper1, false); %false to open gripper, true to close
                         
+
                         case 2
                             disp("Step 4.3: Return robot 1 to base pose")
 
                             %Creep away from cup
-                            PoseGuess = [deg2rad(20),   deg2rad(-110),   deg2rad(-110),   deg2rad(-145),   deg2rad(-80),   deg2rad(-5)];
+                            self.PoseGuess = [deg2rad(20),   deg2rad(-110),   deg2rad(-110),   deg2rad(-145),   deg2rad(-80),   deg2rad(-5)];
                             StepPose = SE3(EmptyCan.homeQ).T * transl(-0.15,0,0.15) * trotx(pi/2) * troty(pi/2);
-                            Robot1Final = r1.model.ikcon(StepPose,PoseGuess);
+                            Robot1Final = r1.model.ikcon(StepPose,self.PoseGuess);
                             jointTrajectory = jtraj(r1.model.getpos, Robot1Final, Steps/2); %work out the path it takes
                             
                             %Return to base pose
                             jointTrajectory2 = jtraj(jointTrajectory(Steps/2,:), self.r1ResetPose, Steps); %work out the path it takes
 
                             jointTrajectory = [jointTrajectory; jointTrajectory2];
-                            MoveRobot(r1, gripper1, false, jointTrajectory, NaN);        
+                            self.MoveRobot(r1, gripper1, false, jointTrajectory, NaN);        
+                                                
+
+                    end
+                    if self.eStopPressed
+                        % E-stop is pressed, exit the loop or take appropriate action
+                        return;
                     end
                     self.SubStateMachine = self.SubStateMachine+1;
+
                 end
                 self.SubStateMachine = 0;
+                self.StateMachine = self.StateMachine+1;
             end
-    end
-end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Helper Functions which do not need to be in the class
-function AlterGripper(gripper, gripperClosed)
-%gripperClosed = true when you want to close the gripper. False when you
-%want to open
-    RotationY = 0.12;
-    if gripperClosed
-        RotationY = -0.12;
-    end
-
-    steps_ = 50; 
-
-    for i = 1:steps_ 
-                gripper.rightFinger.base = gripper.rightFinger.base.T * troty(RotationY/steps_);
-                gripper.leftFinger.base = gripper.leftFinger.base.T * troty(-RotationY/steps_);
-                gripper.rightFinger.animate(gripper.leftFinger.getpos);
-                gripper.leftFinger.animate(gripper.rightFinger.getpos);
-
-                drawnow();
-    end
-end
-
-function MoveRobot(robot, gripper, gripperClosed, jTraj, bottle)       
         
-        FingerRotation = -0.1;
-        if gripperClosed
-            FingerRotation = 0.1;
-        end
-            
-
-        GripperOffset =  transl(0,0,-0.05);
-        BottleOffset =  trotx(-pi/2)  * transl(0,-0.08,-0.08);
-
-        if robot.plyFileNameStem(1) == 'L'
-            GripperOffset =  trotz(pi/2) * transl(0,0,0.05);
-            BottleOffset =   troty(pi/2)  * transl(-0.18,0,-0.1);
-        end
-
-        bottlePassed = isa(bottle, 'IR_Object');
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %Helper Functions need to be in the class to reference the EStop control
+        function AlterGripper(self, gripper, gripperClosed)
+        %gripperClosed = true when you want to close the gripper. False when you
+        %want to open
+            RotationY = 0.12;
+            if gripperClosed
+                RotationY = -0.12;
+            end
         
-        jtrajSize = size(jTraj);
-        for i = 1:jtrajSize
-            %PATRICK BROKE THIS. HE NEEDS A HERO
-                 if Gui.GUIestop
-                % E-stop is pressed, exit the loop or take appropriate action
-                break;
-            elseif self.EStopReleased
-                % E-stop is released
-                if ~self.continuePressed
-                    % Continue button is pressed, take appropriate action
-                    break;
-                end
-                % Add any other actions to be taken when E-stop is released
-                 end
-
-                %adjust and animate the postion of the gripper
-                gripper.gripperbase_.base = robot.model.fkineUTS(jTraj(i,:)) * GripperOffset;
-                gripper.leftFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(FingerRotation);
-                gripper.rightFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(-FingerRotation);
-
-                gripper.gripperbase_.animate(gripper.gripperbase_.getpos);
-                gripper.leftFinger.animate(gripper.leftFinger.getpos);
-                gripper.rightFinger.animate(gripper.rightFinger.getpos);
-
-                if bottlePassed
-                    bottle.model.base = robot.model.fkineUTS(jTraj(i,:)) * BottleOffset;
-                    animate(bottle.model,jTraj(i,:));
-                end
+                            if self.eStopPressed
+                                % E-stop is pressed, exit the loop or take appropriate action
+                                return;
+                           end
+        
+            steps_ = 50; 
+        
+            for i = 1:steps_ 
+                        gripper.rightFinger.base = gripper.rightFinger.base.T * troty(RotationY/steps_);
+                        gripper.leftFinger.base = gripper.leftFinger.base.T * troty(-RotationY/steps_);
+                        gripper.rightFinger.animate(gripper.leftFinger.getpos);
+                        gripper.leftFinger.animate(gripper.rightFinger.getpos);
+        
+                        drawnow();
+            end
+        end
+        
+        function MoveRobot(self, robot, gripper, gripperClosed, jTraj, bottle)       
                 
-                %animate the arm
-                animate(robot.model,jTraj(i,:));
+                FingerRotation = -0.1;
+                if gripperClosed
+                    FingerRotation = 0.1;
+                end
+                    
+        
+                GripperOffset =  transl(0,0,-0.05);
+                BottleOffset =  trotx(-pi/2)  * transl(0,-0.08,-0.08);
+        
+                if robot.plyFileNameStem(1) == 'L'
+                    GripperOffset =  trotz(pi/2) * transl(0,0,0.05);
+                    BottleOffset =   troty(pi/2)  * transl(-0.18,0,-0.1);
+                end
+        
+                bottlePassed = isa(bottle, 'IR_Object');
                 
-                drawnow();
+                jtrajSize = size(jTraj);
+                for i = 1:jtrajSize
+                    %PATRICK BROKE THIS. HE NEEDS A HERO
+                    %      if Gui.GUIestop
+                    %     % E-stop is pressed, exit the loop or take appropriate action
+                    %     break;
+                    % elseif self.EStopReleased
+                    %     % E-stop is released
+                    %     if ~self.continuePressed
+                    %         % Continue button is pressed, take appropriate action
+                    %         break;
+                    %     end
+                    %     % Add any other actions to be taken when E-stop is released
+                    %      end
         
+                            if self.eStopPressed
+                                % E-stop is pressed, exit the loop or take appropriate action
+                                return;
+                           end
+        
+                        %adjust and animate the postion of the gripper
+                        gripper.gripperbase_.base = robot.model.fkineUTS(jTraj(i,:)) * GripperOffset;
+                        gripper.leftFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(FingerRotation);
+                        gripper.rightFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(-FingerRotation);
+        
+                        gripper.gripperbase_.animate(gripper.gripperbase_.getpos);
+                        gripper.leftFinger.animate(gripper.leftFinger.getpos);
+                        gripper.rightFinger.animate(gripper.rightFinger.getpos);
+        
+                        if bottlePassed
+                            bottle.model.base = robot.model.fkineUTS(jTraj(i,:)) * BottleOffset;
+                            animate(bottle.model,jTraj(i,:));
+                        end
+                        
+                        %animate the arm
+                        animate(robot.model,jTraj(i,:));
+                        
+                        drawnow();
+                
+                end
         end
+        
+        function MoveRobotExchangeLiquid(self, robot, gripper, gripperClosed, jTraj, FullBottle, EmptyBottle)       
+                
+                FingerRotation = -0.1;
+                if gripperClosed
+                    FingerRotation = 0.1;
+                end
+                    
+        
+                GripperOffset =  transl(0,0,-0.05);
+                BottleOffset =  trotx(-pi/2)  * transl(0,-0.08,-0.08);
+        
+                if robot.plyFileNameStem(1) == 'L'
+                    GripperOffset =  trotz(pi/2) * transl(0,0,0.05);
+                    BottleOffset =   troty(pi/2)  * transl(-0.18,0,-0.1);
+                end
+        
+                bottlePassed = isa(FullBottle, 'IR_Object');
+        
+                % Get the typical colour of the full bottle
+                Avg1 = mean(FullBottle.vertexColours(:,1));
+                Avg2 = mean(FullBottle.vertexColours(:,1));
+                Avg3 = mean(FullBottle.vertexColours(:,3));
+                colour = [Avg1, Avg2, Avg3]; 
+        
+                VertexArraySize_Full = size(FullBottle.vertexColours);
+                VertexArraySize_Empty = size(EmptyBottle.vertexColours);
+        
+                oldFluidHeight = 20;
+        
+                jtrajSize = size(jTraj);
+                for i = 1:jtrajSize
+                    %patrick has been here
+                    %       if EStopPressed
+                    %     % E-stop is pressed, exit the loop or take appropriate action
+                    %     break;
+                    % elseif self.EStopReleased
+                    %     % E-stop is released
+                    %     if ~self.continuePressed
+                    %         % Continue button is pressed, take appropriate action
+                    %         break;
+                    %     end
+                    %     % Add any other actions to be taken when E-stop is released
+                    %      end
+        
+                            if self.eStopPressed
+                                % E-stop is pressed, exit the loop or take appropriate action
+                                return;
+                           end
+                        %adjust and animate the postion of the gripper
+                        gripper.gripperbase_.base = robot.model.fkineUTS(jTraj(i,:)) * GripperOffset;
+                        gripper.leftFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(FingerRotation);
+                        gripper.rightFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(-FingerRotation);
+        
+                        gripper.gripperbase_.animate(gripper.gripperbase_.getpos);
+                        gripper.leftFinger.animate(gripper.leftFinger.getpos);
+                        gripper.rightFinger.animate(gripper.rightFinger.getpos);
+        
+        
+                        % Chan ge the fluid colour
+                        fluidHeight = round(((i / jtrajSize(1)) * VertexArraySize_Full(1)),0);
+                        for vertexIdx = oldFluidHeight-19:fluidHeight
+                            HoldColour = FullBottle.vertexColours(vertexIdx,:);
+                            FullBottle.vertexColours(vertexIdx,:) = [1,1,1];
+                            EmptyBottle.vertexColours(vertexIdx, :) = HoldColour;
+                            % Set the color to red for this vertex
+                        end
+                        oldFluidHeight = fluidHeight;
+                        FullBottle.h.link(2).Children.FaceVertexCData = FullBottle.vertexColours;
+                        FullBottle.h.link(2).Children.FaceColor = 'interp';
+                    
+                        EmptyBottle.h.link(2).Children.FaceVertexCData = EmptyBottle.vertexColours;
+                        EmptyBottle.h.link(2).Children.FaceColor = 'interp';
+        
+                        if bottlePassed
+                            FullBottle.model.base = robot.model.fkineUTS(jTraj(i,:)) * BottleOffset;
+                            animate(FullBottle.model,jTraj(i,:));
+                        end
+                       
+                        %animate the arm
+                        animate(robot.model,jTraj(i,:));
+                        drawnow();
+                end
+        
+                for i = 1:VertexArraySize_Full
+                    FullBottle.vertexColours(i,:) = [1,1,1];
+        
+                end
+                for i = 1:VertexArraySize_Empty
+                    EmptyBottle.vertexColours(i,:) = colour;
+                end
+                drawnow();
+        end
+    end
 end
 
-function MoveRobotExchangeLiquid(robot, gripper, gripperClosed, jTraj, FullBottle, EmptyBottle)       
-        
-        FingerRotation = -0.1;
-        if gripperClosed
-            FingerRotation = 0.1;
-        end
-            
-
-        GripperOffset =  transl(0,0,-0.05);
-        BottleOffset =  trotx(-pi/2)  * transl(0,-0.08,-0.08);
-
-        if robot.plyFileNameStem(1) == 'L'
-            GripperOffset =  trotz(pi/2) * transl(0,0,0.05);
-            BottleOffset =   troty(pi/2)  * transl(-0.18,0,-0.1);
-        end
-
-        bottlePassed = isa(FullBottle, 'IR_Object');
-
-        % Get the typical colour of the full bottle
-        Avg1 = mean(FullBottle.vertexColours(:,1));
-        Avg2 = mean(FullBottle.vertexColours(:,1));
-        Avg3 = mean(FullBottle.vertexColours(:,3));
-        colour = [Avg1, Avg2, Avg3]; 
-
-        VertexArraySize_Full = size(FullBottle.vertexColours);
-        VertexArraySize_Empty = size(EmptyBottle.vertexColours);
-
-        oldFluidHeight = 1;
-
-        jtrajSize = size(jTraj);
-        for i = 1:jtrajSize
-            %patrick has been here
-            %       if EStopPressed
-            %     % E-stop is pressed, exit the loop or take appropriate action
-            %     break;
-            % elseif self.EStopReleased
-            %     % E-stop is released
-            %     if ~self.continuePressed
-            %         % Continue button is pressed, take appropriate action
-            %         break;
-            %     end
-            %     % Add any other actions to be taken when E-stop is released
-            %      end
-
-
-                %adjust and animate the postion of the gripper
-                gripper.gripperbase_.base = robot.model.fkineUTS(jTraj(i,:)) * GripperOffset;
-                gripper.leftFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(FingerRotation);
-                gripper.rightFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(-FingerRotation);
-
-                gripper.gripperbase_.animate(gripper.gripperbase_.getpos);
-                gripper.leftFinger.animate(gripper.leftFinger.getpos);
-                gripper.rightFinger.animate(gripper.rightFinger.getpos);
-
-
-                % Chan ge the fluid colour
-                fluidHeight = round(((i / jtrajSize(1)) * VertexArraySize_Full(1)),0);
-                for vertexIdx = oldFluidHeight:fluidHeight
-                    HoldColour = FullBottle.vertexColours(vertexIdx,:);
-                    FullBottle.vertexColours(vertexIdx,:) = [1,1,1];
-                    EmptyBottle.vertexColours(vertexIdx, :) = HoldColour;
-                    % Set the color to red for this vertex
-                end
-                oldFluidHeight = fluidHeight;
-                FullBottle.h.link(2).Children.FaceVertexCData = FullBottle.vertexColours;
-                FullBottle.h.link(2).Children.FaceColor = 'interp';
-            
-                EmptyBottle.h.link(2).Children.FaceVertexCData = EmptyBottle.vertexColours;
-                EmptyBottle.h.link(2).Children.FaceColor = 'interp';
-
-                if bottlePassed
-                    FullBottle.model.base = robot.model.fkineUTS(jTraj(i,:)) * BottleOffset;
-                    animate(FullBottle.model,jTraj(i,:));
-                end
-               
-                %animate the arm
-                animate(robot.model,jTraj(i,:));
-                drawnow();
-        end
-
-        for i = 1:VertexArraySize_Full
-            FullBottle.vertexColours(i,:) = [1,1,1];
-
-        end
-        for i = 1:VertexArraySize_Empty
-            EmptyBottle.vertexColours(i,:) = colour;
-        end
-        drawnow();
-end
  
