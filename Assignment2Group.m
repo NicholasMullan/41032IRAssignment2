@@ -662,7 +662,7 @@ classdef Assignment2Group < handle
         end
         
         function MoveRobot(self, robot, gripper, gripperClosed, jTraj, bottle)       
-                
+             
                 FingerRotation = -0.1;
                 if gripperClosed
                     FingerRotation = 0.1;
@@ -685,7 +685,18 @@ classdef Assignment2Group < handle
                             if self.eStopPressed
                                 % E-stop is pressed, exit the loop or take appropriate action
                                 return;
-                           end
+                            end
+
+                            %Check if robot will collide with table
+                            RobotPoseCheck = jTraj(i,:);
+                            trp = robot.model.fkineUTS(RobotPoseCheck);
+                            base_ = robot.model.base.T;
+                            if trp(3,4) < base_(3,4)
+                                disp('Collision pending. Stopping robot');
+                                return;
+                            end                    
+
+
         
                         %adjust and animate the postion of the gripper
                         gripper.gripperbase_.base = robot.model.fkineUTS(jTraj(i,:)) * GripperOffset;
@@ -744,7 +755,18 @@ classdef Assignment2Group < handle
                             if self.eStopPressed
                                 % E-stop is pressed, exit the loop or take appropriate action
                                 return;
-                           end
+                            end
+
+                            %Check if robot will collide with table
+                            RobotPoseCheck = jTraj(i,:);
+                            trp = robot.model.fkineUTS(RobotPoseCheck);
+                            base_ = robot.model.base.T;
+                            if trp(3,4) < base_(3,4)
+                                disp('Collision pending. Stopping robot');
+                                return;
+                            end       
+
+                        
                         %adjust and animate the postion of the gripper
                         gripper.gripperbase_.base = robot.model.fkineUTS(jTraj(i,:)) * GripperOffset;
                         gripper.leftFinger.base = gripper.gripperbase_.base.T * transl(0,0.1,0) * troty(FingerRotation);
