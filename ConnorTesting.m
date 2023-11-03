@@ -166,12 +166,14 @@ MoveRobot(r2, gripper2, false, jointTrajectory, NaN);
 
 
 %% Test the creation of bottles
+hold on
+
 bottleTypes = {
-                'CanYellow.ply';
-                'CanRed.ply';
-                'CanBlue.ply';
-                'CanGreen.ply';
-                };
+                'Can.ply', [255,255,0]; %%Corona
+                'Can.ply', [5,102,18]; %VB
+                'Can.ply', [255,255,185]; %Guiness
+                'Can.ply', [255,0,0]; %Draught
+                }
 
 StartingX = 0;
 TallBarTable = 0.05;
@@ -183,8 +185,13 @@ InitialObjectLocationsArray = [
                 StartingX,    0.2,    TallBarTable;          %Object 4
             ];
 
+
+
+Chka = bottleTypes{1,1};
+Chkb = bottleTypes{1,2}; 
+
 for i = 1:size(bottleTypes,1)
-    BottleArray{i} = IR_Object([bottleTypes{i}],['Bottle', num2str(i)], InitialObjectLocationsArray(i,:)); 
+    BottleArray{i} = IR_Object([bottleTypes{i,1}],['Bottle', num2str(i)], InitialObjectLocationsArray(i,:),bottleTypes{i,2}); 
 end
 
 
