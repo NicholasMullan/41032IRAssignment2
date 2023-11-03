@@ -17,7 +17,7 @@ classdef IR_Object < RobotBaseClass
 
     methods 
         function self = IR_Object(type, name, pose, colour)
-        hold on;
+       hold on;
         self.name = name;
         self.model.name = name;
         self.BasePose = pose;

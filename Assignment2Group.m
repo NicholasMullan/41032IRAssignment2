@@ -25,7 +25,7 @@ classdef Assignment2Group < handle
         bottleTypes = {
             'Can.ply', [255,255,0]; %%Corona
             'Can.ply', [5,102,18]; %VB
-            'Can.ply', [255,255,185]; %Guiness
+            'Can.ply', [24,0,0]; %Guiness
             'Can.ply', [255,0,0]; %Draught
             };
         NumberOfBottles = 4; %how many do we want to simulate
@@ -219,7 +219,7 @@ classdef Assignment2Group < handle
                     self.BottleArray{i} = IR_Object([self.bottleTypes{i,1}],['Bottle', num2str(i)], self.InitialObjectLocationsArray(i,:),self.bottleTypes{i,2}); 
                 end
            
-                self.EmptyCan = IR_Object('CanClear.ply','EmptyCan', self.FinalObjectLocationsArray(1,:), [255,255,255]); 
+                self.EmptyCan = IR_Object('Can.ply','EmptyCan', self.FinalObjectLocationsArray(1,:), [255,255,255]); 
         
             end
 
@@ -242,17 +242,17 @@ classdef Assignment2Group < handle
                 %input from GUI selects which drink should be ordered
     
                 % Based on the drink choice, set the initial location in this function
-
+                BottleNumber = 1;
                 switch (Drink)
                    
-                    case "Solo"
-                        BottleNumber = 4;
-                    case "CocaCola"
-                        BottleNumber = 3;
-                     case "Lemonade"
-                        BottleNumber = 2;
-                    case "Fanta"
+                    case "Corona"
                         BottleNumber = 1;
+                    case "VB"
+                        BottleNumber = 2;
+                     case "Guinness"
+                        BottleNumber = 3;
+                    case "Draught"
+                        BottleNumber = 4;
                     otherwise 
                         display("Error: " + Drink + " - out of stock");
                 end
@@ -681,19 +681,7 @@ classdef Assignment2Group < handle
                 
                 jtrajSize = size(jTraj);
                 for i = 1:jtrajSize
-                    %PATRICK BROKE THIS. HE NEEDS A HERO
-                    %      if Gui.GUIestop
-                    %     % E-stop is pressed, exit the loop or take appropriate action
-                    %     break;
-                    % elseif self.EStopReleased
-                    %     % E-stop is released
-                    %     if ~self.continuePressed
-                    %         % Continue button is pressed, take appropriate action
-                    %         break;
-                    %     end
-                    %     % Add any other actions to be taken when E-stop is released
-                    %      end
-        
+                  
                             if self.eStopPressed
                                 % E-stop is pressed, exit the loop or take appropriate action
                                 return;
@@ -752,19 +740,7 @@ classdef Assignment2Group < handle
         
                 jtrajSize = size(jTraj);
                 for i = 1:jtrajSize
-                    %patrick has been here
-                    %       if EStopPressed
-                    %     % E-stop is pressed, exit the loop or take appropriate action
-                    %     break;
-                    % elseif self.EStopReleased
-                    %     % E-stop is released
-                    %     if ~self.continuePressed
-                    %         % Continue button is pressed, take appropriate action
-                    %         break;
-                    %     end
-                    %     % Add any other actions to be taken when E-stop is released
-                    %      end
-        
+                          
                             if self.eStopPressed
                                 % E-stop is pressed, exit the loop or take appropriate action
                                 return;
