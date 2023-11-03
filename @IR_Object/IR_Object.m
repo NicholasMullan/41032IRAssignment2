@@ -8,6 +8,7 @@ classdef IR_Object < RobotBaseClass
         BasePose %Hold the value of the base pose
         Name
         Type
+        Colour_
 
         h;
         vertexColours;
@@ -15,13 +16,14 @@ classdef IR_Object < RobotBaseClass
     end
 
     methods 
-        function self = IR_Object(type, name, pose)
+        function self = IR_Object(type, name, pose, colour)
         hold on;
         self.name = name;
         self.model.name = name;
         self.BasePose = pose;
         self.homeQ = pose;
         self.Type = type;
+        self.Colour_ = colour; 
 
         self.CreateModel();
         self.model.base = pose;
@@ -92,6 +94,13 @@ classdef IR_Object < RobotBaseClass
                 self.MultirobotWarningMessage();
                 self.h = self.h{1};
             end
+            
+            lengthVertex = size(plyData{2}.vertex.red,1);
+            for i = 1:lengthVertex
+                plyData{2}.vertex.red(i,:) = self.Colour_(1);
+                plyData{2}.vertex.green(i,:) = self.Colour_(2);
+                plyData{2}.vertex.blue(i,:) = self.Colour_(3);
+            end
 
             % Try to correctly colour the arm (if colours are in ply file data)
             for linkIndex = 0:self.model.n
@@ -100,7 +109,6 @@ classdef IR_Object < RobotBaseClass
                      self.vertexColours = [plyData{linkIndex+1}.vertex.red ...
                                      , plyData{linkIndex+1}.vertex.green ...
                                      , plyData{linkIndex+1}.vertex.blue]/255;
-
                 catch ME_1
                     disp(ME_1);
                     disp('No vertex colours in plyData');

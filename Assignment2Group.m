@@ -23,10 +23,10 @@ classdef Assignment2Group < handle
 
         %Bottles
         bottleTypes = {
-            'CanYellow.ply';
-            'CanRed.ply';
-            'CanBlue.ply';
-            'CanGreen.ply';
+            'Can.ply', [255,255,0]; %%Corona
+            'Can.ply', [5,102,18]; %VB
+            'Can.ply', [255,255,185]; %Guiness
+            'Can.ply', [255,0,0]; %Draught
             };
         NumberOfBottles = 4; %how many do we want to simulate
 
@@ -189,10 +189,8 @@ classdef Assignment2Group < handle
                 hold on
                 display("Placing bottles");
 
-        
                 StartingX = -1.5;
-            
-            
+ 
                 self.InitialObjectLocationsArray = [
                     %Location XYZ   
                     StartingX,    0,     self.TallBarTable;           %Object 1
@@ -218,12 +216,10 @@ classdef Assignment2Group < handle
                 ];
           
                 for i = 1:self.NumberOfBottles
-                    self.BottleArray{i} = IR_Object([self.bottleTypes{i}],['Bottle', num2str(i)], self.InitialObjectLocationsArray(i,:)); 
+                    self.BottleArray{i} = IR_Object([self.bottleTypes{i,1}],['Bottle', num2str(i)], self.InitialObjectLocationsArray(i,:),self.bottleTypes{i,2}); 
                 end
            
-                self.EmptyCan = IR_Object('CanClear.ply','EmptyCan', self.FinalObjectLocationsArray(1,:)); 
-            
-            
+                self.EmptyCan = IR_Object('CanClear.ply','EmptyCan', self.FinalObjectLocationsArray(1,:), [255,255,255]); 
         
             end
 
